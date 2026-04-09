@@ -7,24 +7,24 @@ const FEEDBACK_API = '/api/feedback'
 // ── Level 2 category display config ──────────────────────────────────────────
 
 const LEVEL2_CONFIG = {
-  // LOVE_GOD children
-  'KNOW_FEAR_CLING':          { label: 'KNOW, FEAR & CLING', short: '(1)', color: [147, 197, 253] },
-  'NO_IDOLATRY':              { label: 'NO IDOLATRY', short: '(2)', color: [103, 232, 249] },
-  'GODS_NAME':                { label: "GOD'S NAME", short: '(3)', color: [125, 211, 252] },
-  'SACRED_TIMES':             { label: 'SACRED TIMES', short: '(4)', color: [167, 139, 250] },
-  'WORSHIP_AND_OFFERINGS':    { label: 'WORSHIP & OFFERINGS', color: [192, 132, 252] },
-  'PRIESTHOOD_AND_SANCTUARY': { label: 'PRIESTHOOD & SANCTUARY', color: [139, 167, 250] },
-  'PURITY_AND_HOLINESS':      { label: 'PURITY & HOLINESS', color: [167, 200, 250] },
-  'VOWS_AND_DEDICATIONS':     { label: 'VOWS & DEDICATIONS', color: [180, 170, 250] },
-  // LOVE_NEIGHBOR children
-  'HONOR_PARENTS':            { label: 'HONOR PARENTS', short: '(5)', color: [134, 239, 172] },
-  'NO_MURDER':                { label: 'DO NOT MURDER', short: '(6)', color: [110, 231, 183] },
-  'NO_ADULTERY':              { label: 'NO ADULTERY', short: '(7)', color: [192, 132, 252] },
-  'NO_STEALING':              { label: 'DO NOT STEAL', short: '(8)', color: [253, 224, 71] },
-  'NO_FALSE_WITNESS':         { label: 'NO FALSE WITNESS', short: '(9)', color: [251, 191, 36] },
-  'NO_COVETING':              { label: 'DO NOT COVET', short: '(10)', color: [251, 146, 60] },
-  'COMPASSION_AND_CARE':      { label: 'COMPASSION & CARE', color: [134, 200, 172] },
-  'WARFARE_AND_NATIONAL_LIFE':{ label: 'WARFARE & NATIONAL LIFE', color: [200, 180, 130] },
+  // LOVE_GOD children — warm gold/amber spectrum
+  'KNOW_FEAR_CLING':          { label: 'KNOW, FEAR & CLING', short: '(1)', color: [220, 190, 130] },
+  'NO_IDOLATRY':              { label: 'NO IDOLATRY', short: '(2)', color: [200, 170, 120] },
+  'GODS_NAME':                { label: "GOD'S NAME", short: '(3)', color: [210, 180, 125] },
+  'SACRED_TIMES':             { label: 'SACRED TIMES', short: '(4)', color: [230, 195, 140] },
+  'WORSHIP_AND_OFFERINGS':    { label: 'WORSHIP & OFFERINGS', color: [210, 165, 130] },
+  'PRIESTHOOD_AND_SANCTUARY': { label: 'PRIESTHOOD & SANCTUARY', color: [195, 175, 140] },
+  'PURITY_AND_HOLINESS':      { label: 'PURITY & HOLINESS', color: [205, 185, 145] },
+  'VOWS_AND_DEDICATIONS':     { label: 'VOWS & DEDICATIONS', color: [215, 175, 135] },
+  // LOVE_NEIGHBOR children — warm sage/earth spectrum
+  'HONOR_PARENTS':            { label: 'HONOR PARENTS', short: '(5)', color: [170, 195, 130] },
+  'NO_MURDER':                { label: 'DO NOT MURDER', short: '(6)', color: [155, 185, 125] },
+  'NO_ADULTERY':              { label: 'NO ADULTERY', short: '(7)', color: [185, 170, 130] },
+  'NO_STEALING':              { label: 'DO NOT STEAL', short: '(8)', color: [195, 180, 120] },
+  'NO_FALSE_WITNESS':         { label: 'NO FALSE WITNESS', short: '(9)', color: [190, 175, 125] },
+  'NO_COVETING':              { label: 'DO NOT COVET', short: '(10)', color: [180, 165, 120] },
+  'COMPASSION_AND_CARE':      { label: 'COMPASSION & CARE', color: [160, 190, 140] },
+  'WARFARE_AND_NATIONAL_LIFE':{ label: 'WARFARE & NATIONAL LIFE', color: [185, 170, 125] },
 }
 
 const SUBCATEGORY_THRESHOLD = 20
@@ -42,6 +42,63 @@ const LAW_LIST_X_OFFSET = -20  // left of parent center
 
 const LOVE_GOD_X = 600
 const LOVE_NEIGHBOR_X = 1800
+
+// ── Bible book number → name (bolls.life uses numeric book IDs) ──────────────
+
+const BOOK_NAMES = {
+  1: 'Genesis', 2: 'Exodus', 3: 'Leviticus', 4: 'Numbers', 5: 'Deuteronomy',
+  6: 'Joshua', 7: 'Judges', 8: 'Ruth', 9: '1 Samuel', 10: '2 Samuel',
+  11: '1 Kings', 12: '2 Kings', 13: '1 Chronicles', 14: '2 Chronicles',
+  15: 'Ezra', 16: 'Nehemiah', 17: 'Esther', 18: 'Job', 19: 'Psalms',
+  20: 'Proverbs', 21: 'Ecclesiastes', 22: 'Song of Solomon', 23: 'Isaiah',
+  24: 'Jeremiah', 25: 'Lamentations', 26: 'Ezekiel', 27: 'Daniel',
+  28: 'Hosea', 29: 'Joel', 30: 'Amos', 31: 'Obadiah', 32: 'Jonah',
+  33: 'Micah', 34: 'Nahum', 35: 'Habakkuk', 36: 'Zephaniah', 37: 'Haggai',
+  38: 'Zechariah', 39: 'Malachi', 40: 'Matthew', 41: 'Mark', 42: 'Luke',
+  43: 'John', 44: 'Acts', 45: 'Romans', 46: '1 Corinthians',
+  47: '2 Corinthians', 48: 'Galatians', 49: 'Ephesians', 50: 'Philippians',
+  51: 'Colossians', 52: '1 Thessalonians', 53: '2 Thessalonians',
+  54: '1 Timothy', 55: '2 Timothy', 56: 'Titus', 57: 'Philemon',
+  58: 'Hebrews', 59: 'James', 60: '1 Peter', 61: '2 Peter', 62: '1 John',
+  63: '2 John', 64: '3 John', 65: 'Jude', 66: 'Revelation',
+  67: '1 Esdras', 68: 'Tobit', 69: 'Judith', 70: 'Wisdom of Solomon',
+  71: 'Sirach', 72: "Jeremy's Letter", 73: 'Baruch', 74: '1 Maccabees',
+  75: '2 Maccabees', 76: '3 Maccabees', 77: '2 Esdras', 78: 'Susanna',
+  79: 'Bel and the Dragon', 80: '4 Maccabees',
+  81: 'Greek Additions to Esther', 82: "3 Holy Children's Song",
+  83: 'Prayer of Manasses',
+}
+
+const STOP_WORDS = new Set([
+  'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for',
+  'of', 'with', 'by', 'from', 'is', 'it', 'its', 'that', 'this', 'was',
+  'are', 'be', 'has', 'had', 'have', 'he', 'she', 'his', 'her', 'him',
+  'you', 'your', 'they', 'them', 'their', 'we', 'our', 'who', 'whom',
+  'which', 'what', 'will', 'shall', 'may', 'not', 'no', 'nor', 'if',
+  'as', 'so', 'do', 'did', 'does', 'been', 'being', 'were', 'am', 'i',
+  'me', 'my', 'all', 'each', 'every', 'any', 'one', 'two', 'into',
+  'out', 'up', 'also', 'than', 'then', 'said', 'says', 'say', 'when',
+  'there', 'here', 'more', 'must', 'about', 'over', 'such', 'after',
+  'before', 'these', 'those', 'own', 'how', 'because', 'would', 'could',
+  'should', 'make', 'can', 'upon', 'let', 'us', 'come', 'came', 'give',
+  'gave', 'take', 'took', 'went', 'go', 'among', 'through', 'under',
+])
+
+function extractKeywords(text, maxCount = 12) {
+  if (!text) return []
+  const words = text
+    .replace(/["""''.,;:!?()[\]{}<>—–\-\/\\]/g, ' ')
+    .split(/\s+/)
+    .map(w => w.toLowerCase().trim())
+    .filter(w => w.length > 3 && !STOP_WORDS.has(w) && !/^\d+$/.test(w))
+  // Deduplicate, keep order
+  const seen = new Set()
+  const unique = []
+  for (const w of words) {
+    if (!seen.has(w)) { seen.add(w); unique.push(w) }
+  }
+  return unique.slice(0, maxCount)
+}
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -128,10 +185,18 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
   const [activePath, setActivePath] = useState(new Set())
   const [breadcrumbs, setBreadcrumbs] = useState(['Torah Laws'])
 
+  // Side panel tab state
+  const [sideTab, setSideTab] = useState('study')  // 'study' | 'details'
+
   // Search state
   const [searchQuery, setSearchQuery] = useState('')
   const [showSearch, setShowSearch] = useState(false)
   const searchInputRef = useRef(null)
+
+  // Verse lookup state
+  const [fetchedVerse, setFetchedVerse] = useState(null)  // { reference, text, loading, error }
+  const [verseCache, setVerseCache] = useState({})         // cache by reference string
+  const [keywordResults, setKeywordResults] = useState(null) // { keyword, results[], loading, error }
 
   // Feedback dialog state
   const [showFeedback, setShowFeedback] = useState(false)
@@ -143,9 +208,69 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
   const [feedbackSent, setFeedbackSent] = useState(false)
   const [feedbackError, setFeedbackError] = useState('')
 
+  // Fetch a verse from bible-api.com
+  const fetchVerse = useCallback((ref) => {
+    // Clean the reference: strip parenthetical notes, trim
+    const cleanRef = ref.replace(/\s*\(.*?\)\s*/g, '').trim()
+    if (!cleanRef) return
+
+    // Check cache
+    if (verseCache[cleanRef]) {
+      setFetchedVerse({ reference: cleanRef, text: verseCache[cleanRef], loading: false, error: null })
+      return
+    }
+
+    setFetchedVerse({ reference: cleanRef, text: null, loading: true, error: null })
+
+    const apiRef = cleanRef.replace(/\s+/g, '+')
+    fetch(`https://bible-api.com/${encodeURIComponent(apiRef)}`)
+      .then(res => {
+        if (!res.ok) throw new Error('Verse not found')
+        return res.json()
+      })
+      .then(data => {
+        const text = data.text?.trim()
+        if (!text) throw new Error('No text returned')
+        setVerseCache(prev => ({ ...prev, [cleanRef]: text }))
+        setFetchedVerse({ reference: data.reference || cleanRef, text, loading: false, error: null })
+      })
+      .catch(() => {
+        setFetchedVerse({ reference: cleanRef, text: null, loading: false, error: 'Could not load verse' })
+      })
+  }, [verseCache])
+
+  // Search Bible by keyword via bolls.life
+  const searchKeyword = useCallback((keyword) => {
+    setKeywordResults({ keyword, results: [], loading: true, error: null })
+    fetch(`https://bolls.life/search/WEB/${encodeURIComponent(keyword)}/`)
+      .then(res => {
+        if (!res.ok) throw new Error('Search failed')
+        return res.json()
+      })
+      .then(data => {
+        const results = (data || []).slice(0, 20).map(v => ({
+          reference: `${BOOK_NAMES[v.book] || `Book ${v.book}`} ${v.chapter}:${v.verse}`,
+          text: (v.text || '').replace(/<\/?mark>/g, ''),
+          highlighted: v.text || '',
+        }))
+        setKeywordResults({ keyword, results, loading: false, error: null })
+      })
+      .catch(() => {
+        setKeywordResults({ keyword, results: [], loading: false, error: 'Search failed' })
+      })
+  }, [])
+
+  // Reset panel state when law changes
+  useEffect(() => {
+    setFetchedVerse(null)
+    setKeywordResults(null)
+    setSideTab('study')
+  }, [selectedLaw])
+
   // Canvas refs
   const nodesRef = useRef([])
   const edgesRef = useRef([])
+  const handleNodeClickRef = useRef(null)
   const panRef = useRef({ x: 0, y: 0 })
   const targetPanRef = useRef({ x: 0, y: 0 })
   const zoomRef = useRef(1)
@@ -284,13 +409,13 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
     // ─ Great commands ─
     nodes.push({
       id: 'LOVE_GOD', label: 'LOVE YHWH', subtitle: 'with all your heart',
-      type: 'great-command', color: [147, 197, 253],
+      type: 'great-command', color: [220, 190, 130],
       coreRadius: 10, glowRadius: 60,
       x: LOVE_GOD_X, y: ROOT_Y,
     })
     nodes.push({
       id: 'LOVE_NEIGHBOR', label: 'LOVE YOUR NEIGHBOR', subtitle: 'as yourself',
-      type: 'great-command', color: [134, 239, 172],
+      type: 'great-command', color: [170, 195, 130],
       coreRadius: 10, glowRadius: 60,
       x: LOVE_NEIGHBOR_X, y: ROOT_Y,
     })
@@ -340,9 +465,9 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
       }
 
       lawsToShow.forEach((law, i) => {
-        const lawColor = law.has_forever_language ? [192, 132, 252]
-          : law.duration_type === 'contextual_specific' ? [148, 163, 184]
-          : color || [103, 232, 249]
+        const lawColor = law.has_forever_language ? [210, 160, 140]
+          : law.duration_type === 'contextual_specific' ? [148, 140, 125]
+          : color || [180, 195, 150]
         nodes.push({
           id: `law-${law.id}`,
           label: getShortTitle(law, 55),
@@ -510,7 +635,11 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
       const source = nodes.find(n => n.id === edge.source)
       const target = nodes.find(n => n.id === edge.target)
       if (!source || !target) return
-      const isOnPath = pathSet.has(edge.source) && pathSet.has(edge.target)
+      // For edges to law nodes, glow if the parent category is on the path
+      // (the parent→first-law edge should glow when ANY law in that list is selected)
+      const isOnPath = target.type === 'law'
+        ? pathSet.has(edge.source)
+        : pathSet.has(edge.source) && pathSet.has(edge.target)
       const [r, g, b] = source.color
 
       ctx.beginPath()
@@ -600,13 +729,13 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
         : node.type === 'level3' || node.type === 'level4' ? 9
         : 8
 
-      ctx.font = `${fontSize}px 'Share Tech Mono', monospace`
+      ctx.font = `${fontSize}px 'JetBrains Mono', monospace`
       ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${labelAlpha})`
       const labelY = node.y + node.coreRadius + 10
       ctx.fillText(node.label, node.x, labelY)
 
       if (node.sublabel) {
-        ctx.font = `${fontSize - 2}px 'Share Tech Mono', monospace`
+        ctx.font = `${fontSize - 2}px 'JetBrains Mono', monospace`
         ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${labelAlpha * 0.65})`
         ctx.fillText(node.sublabel, node.x, labelY + fontSize + 3)
       }
@@ -637,14 +766,14 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
 
       // Reference (bold-ish)
       ctx.textAlign = 'left'
-      ctx.font = `bold 10px 'Share Tech Mono', monospace`
+      ctx.font = `bold 10px 'JetBrains Mono', monospace`
       ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`
       ctx.fillText(node.refLabel || '', node.x + 10, node.y)
 
       // Title
       const refWidth = node.refLabel ? ctx.measureText(node.refLabel).width + 12 : 0
-      ctx.font = `10px 'Share Tech Mono', monospace`
-      ctx.fillStyle = `rgba(220, 225, 235, ${alpha * 0.8})`
+      ctx.font = `10px 'JetBrains Mono', monospace`
+      ctx.fillStyle = `rgba(235, 225, 205, ${alpha * 0.8})`
       ctx.fillText(node.label, node.x + 10 + refWidth, node.y)
     })
 
@@ -797,6 +926,9 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
     }
   }, [expandedL2, expandedL3, expandedL4, hierarchy, laws, onSelectLaw, focusOnArea, focusOnFullTree, buildActivePath])
 
+  // Keep ref in sync so canvas event handlers always call the latest version
+  handleNodeClickRef.current = handleNodeClick
+
   // ── Canvas setup & events ────────────────────────────────────────────────
 
   useEffect(() => {
@@ -854,7 +986,7 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
       if (dist < 5) {
         const world = screenToWorld(pos.x, pos.y)
         const node = nodeAt(world.x, world.y)
-        if (node) handleNodeClick(node)
+        if (node) handleNodeClickRef.current(node)
       }
       isPanningRef.current = false
       mouseDownPos = null
@@ -911,7 +1043,7 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
         if (dist < 10) {
           const world = screenToWorld(pos.x, pos.y)
           const node = nodeAt(world.x, world.y)
-          if (node) handleNodeClick(node)
+          if (node) handleNodeClickRef.current(node)
         }
       }
       isPanningRef.current = false
@@ -1119,7 +1251,7 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
               <div className="side-panel-title-area">
                 <h2 className="side-panel-title">{selectedLaw.reference}</h2>
                 {selectedLaw.has_forever_language && (
-                  <Sparkles className="w-4 h-4 side-panel-eternal-icon" />
+                  <Sparkles className="w-5 h-5 side-panel-eternal-icon" />
                 )}
               </div>
               <button onClick={onCloseLaw} className="side-panel-close">
@@ -1127,130 +1259,259 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
               </button>
             </div>
 
-            <div className="side-panel-body">
-              <p className="side-panel-ref">
-                {selectedLaw.book} {selectedLaw.chapter}:{selectedLaw.verse}
-              </p>
-
-              <section className="side-panel-section">
-                <h3 className="side-panel-label">Verse Text</h3>
-                <blockquote className="side-panel-verse">{selectedLaw.verse_text}</blockquote>
-              </section>
-
-              <section className="side-panel-section">
-                <h3 className="side-panel-label">Law Summary</h3>
-                <p className="side-panel-text">{selectedLaw.law_summary}</p>
-              </section>
-
-              <section className="side-panel-section side-panel-grid">
-                <h3 className="side-panel-label">
-                  <Info className="w-3 h-3" style={{ display: 'inline', marginRight: '4px' }} />
-                  Classification
-                </h3>
-                <div className="side-panel-field">
-                  <span className="side-panel-field-label">Duration</span>
-                  <span className="side-panel-field-value">{selectedLaw.duration_type?.replace(/_/g, ' ') || 'Not analyzed'}</span>
-                </div>
-                <div className="side-panel-field">
-                  <span className="side-panel-field-label">Applicability</span>
-                  <span className="side-panel-field-value">{selectedLaw.current_applicability?.replace(/_/g, ' ') || 'Not analyzed'}</span>
-                </div>
-                <div className="side-panel-field">
-                  <span className="side-panel-field-label">Regulated Party</span>
-                  <span className="side-panel-field-value">{selectedLaw.regulated_party || 'Not specified'}</span>
-                </div>
-                {selectedLaw.categories?.length > 0 && (
-                  <div className="side-panel-field">
-                    <span className="side-panel-field-label">Category</span>
-                    <span className="side-panel-field-value">
-                      {selectedLaw.categories.map(c => c.split(' > ').slice(1).join(' > ')).join('; ')}
-                    </span>
-                  </div>
-                )}
-              </section>
-
-              {(selectedLaw.has_forever_language || selectedLaw.has_generational_language) && (
-                <section className="side-panel-section side-panel-eternal">
-                  <h3 className="side-panel-label">
-                    <Sparkles className="w-3 h-3" style={{ display: 'inline', marginRight: '4px' }} />
-                    Eternal Language
-                  </h3>
-                  {selectedLaw.has_forever_language && selectedLaw.forever_phrase && (
-                    <p className="side-panel-text side-panel-phrase">"{selectedLaw.forever_phrase}"</p>
-                  )}
-                  {selectedLaw.has_generational_language && selectedLaw.generational_phrase && (
-                    <p className="side-panel-text side-panel-phrase">"{selectedLaw.generational_phrase}"</p>
-                  )}
-                </section>
-              )}
-
-              {(selectedLaw.requires_temple || selectedLaw.requires_priesthood || selectedLaw.requires_land_israel) && (
-                <section className="side-panel-section">
-                  <h3 className="side-panel-label">
-                    <Clock className="w-3 h-3" style={{ display: 'inline', marginRight: '4px' }} />
-                    Prerequisites
-                  </h3>
-                  {selectedLaw.requires_temple && selectedLaw.requires_temple !== 'no' && (
-                    <p className="side-panel-prereq">Temple: {selectedLaw.requires_temple}</p>
-                  )}
-                  {selectedLaw.requires_priesthood && selectedLaw.requires_priesthood !== 'no' && (
-                    <p className="side-panel-prereq">Priesthood: {selectedLaw.requires_priesthood}</p>
-                  )}
-                  {selectedLaw.requires_land_israel && selectedLaw.requires_land_israel !== 'no' && (
-                    <p className="side-panel-prereq">Land of Israel: {selectedLaw.requires_land_israel}</p>
-                  )}
-                </section>
-              )}
-
-              {selectedLaw.classification_reasoning && (
-                <section className="side-panel-section">
-                  <h3 className="side-panel-label">Reasoning</h3>
-                  <p className="side-panel-text">{selectedLaw.classification_reasoning}</p>
-                </section>
-              )}
-
-              {selectedLaw.cross_references?.length > 0 && (
-                <section className="side-panel-section">
-                  <h3 className="side-panel-label">
-                    <BookOpen className="w-3 h-3" style={{ display: 'inline', marginRight: '4px' }} />
-                    Cross References
-                  </h3>
-                  <p className="side-panel-text">{selectedLaw.cross_references.join(', ')}</p>
-                </section>
-              )}
-
-              {selectedLaw.other_torah_refs && (
-                <section className="side-panel-section">
-                  <h3 className="side-panel-label">
-                    <BookOpen className="w-3 h-3" style={{ display: 'inline', marginRight: '4px' }} />
-                    Related Verses
-                  </h3>
-                  <p className="side-panel-text">{selectedLaw.other_torah_refs}</p>
-                </section>
-              )}
-
-              {selectedLaw.notes && (
-                <section className="side-panel-section">
-                  <h3 className="side-panel-label">
-                    <MessageSquare className="w-3 h-3" style={{ display: 'inline', marginRight: '4px' }} />
-                    Notes
-                  </h3>
-                  <p className="side-panel-text">{selectedLaw.notes}</p>
-                </section>
-              )}
-
-              {/* Report / Suggestion button */}
+            {/* Tabs */}
+            <div className="side-panel-tabs">
               <button
-                className="side-panel-report-btn"
-                onClick={() => {
-                  setFeedbackContext(`${selectedLaw.reference} — ${selectedLaw.law_summary}`)
-                  setFeedbackSent(false)
-                  setShowFeedback(true)
-                }}
+                className={`side-panel-tab ${sideTab === 'study' ? 'active' : ''}`}
+                onClick={() => setSideTab('study')}
               >
-                <Mail className="w-3.5 h-3.5" />
-                Report Issue or Suggest Correction
+                <BookOpen className="w-4 h-4" />
+                Study
               </button>
+              <button
+                className={`side-panel-tab ${sideTab === 'details' ? 'active' : ''}`}
+                onClick={() => setSideTab('details')}
+              >
+                <Info className="w-4 h-4" />
+                Details
+              </button>
+            </div>
+
+            <div className="side-panel-body">
+
+              {/* ── Study Tab ── */}
+              {sideTab === 'study' && (
+                <>
+                  <section className="side-panel-section">
+                    <h3 className="side-panel-label">Verse Text</h3>
+                    <blockquote className="side-panel-verse">{selectedLaw.verse_text}</blockquote>
+                  </section>
+
+                  <section className="side-panel-section">
+                    <h3 className="side-panel-label">Law Summary</h3>
+                    <p className="side-panel-text">{selectedLaw.law_summary}</p>
+                  </section>
+
+                  {(selectedLaw.has_forever_language || selectedLaw.has_generational_language) && (
+                    <section className="side-panel-section side-panel-eternal">
+                      <h3 className="side-panel-label">
+                        <Sparkles className="w-3.5 h-3.5" style={{ display: 'inline', marginRight: '5px' }} />
+                        Eternal Language
+                      </h3>
+                      {selectedLaw.has_forever_language && selectedLaw.forever_phrase && (
+                        <p className="side-panel-text side-panel-phrase">"{selectedLaw.forever_phrase}"</p>
+                      )}
+                      {selectedLaw.has_generational_language && selectedLaw.generational_phrase && (
+                        <p className="side-panel-text side-panel-phrase">"{selectedLaw.generational_phrase}"</p>
+                      )}
+                    </section>
+                  )}
+
+                  {selectedLaw.cross_references?.length > 0 && (
+                    <section className="side-panel-section">
+                      <h3 className="side-panel-label">
+                        <BookOpen className="w-3.5 h-3.5" style={{ display: 'inline', marginRight: '5px' }} />
+                        Cross References
+                      </h3>
+                      <div className="side-panel-refs">
+                        {selectedLaw.cross_references.map((ref, i) => (
+                          <button key={i} className="verse-ref-btn" onClick={() => fetchVerse(ref)}>
+                            {ref}
+                          </button>
+                        ))}
+                      </div>
+                    </section>
+                  )}
+
+                  {selectedLaw.other_torah_refs && (
+                    <section className="side-panel-section">
+                      <h3 className="side-panel-label">
+                        <BookOpen className="w-3.5 h-3.5" style={{ display: 'inline', marginRight: '5px' }} />
+                        Related Verses
+                      </h3>
+                      <div className="side-panel-refs">
+                        {selectedLaw.other_torah_refs.split(/,\s*(?=[A-Z0-9])/).map((ref, i) => {
+                          const clean = ref.trim()
+                          if (!clean) return null
+                          return (
+                            <button key={i} className="verse-ref-btn" onClick={() => fetchVerse(clean)}>
+                              {clean}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </section>
+                  )}
+
+                  {/* Fetched verse display */}
+                  {fetchedVerse && (
+                    <section className="side-panel-section side-panel-fetched-verse">
+                      <div className="fetched-verse-header">
+                        <h3 className="side-panel-label">
+                          <BookOpen className="w-3.5 h-3.5" style={{ display: 'inline', marginRight: '5px' }} />
+                          {fetchedVerse.reference}
+                        </h3>
+                        <button className="fetched-verse-close" onClick={() => setFetchedVerse(null)}>
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                      {fetchedVerse.loading && (
+                        <p className="side-panel-text fetched-verse-loading">Loading verse...</p>
+                      )}
+                      {fetchedVerse.error && (
+                        <p className="side-panel-text fetched-verse-error">{fetchedVerse.error}</p>
+                      )}
+                      {fetchedVerse.text && (
+                        <>
+                          <blockquote className="side-panel-verse">{fetchedVerse.text}</blockquote>
+                          <div className="keyword-tags">
+                            {extractKeywords(fetchedVerse.text).map((kw, i) => (
+                              <button key={i} className="keyword-tag" onClick={() => searchKeyword(kw)}>
+                                {kw}
+                              </button>
+                            ))}
+                          </div>
+                        </>
+                      )}
+                    </section>
+                  )}
+
+                  {/* Keywords from verse text */}
+                  {!fetchedVerse && selectedLaw.verse_text && (
+                    <section className="side-panel-section">
+                      <h3 className="side-panel-label">
+                        <Search className="w-3.5 h-3.5" style={{ display: 'inline', marginRight: '5px' }} />
+                        Search by Keyword
+                      </h3>
+                      <div className="keyword-tags">
+                        {extractKeywords(selectedLaw.verse_text).map((kw, i) => (
+                          <button key={i} className="keyword-tag" onClick={() => searchKeyword(kw)}>
+                            {kw}
+                          </button>
+                        ))}
+                      </div>
+                    </section>
+                  )}
+
+                  {/* Keyword search results */}
+                  {keywordResults && (
+                    <section className="side-panel-section side-panel-keyword-results">
+                      <div className="fetched-verse-header">
+                        <h3 className="side-panel-label">
+                          <Search className="w-3.5 h-3.5" style={{ display: 'inline', marginRight: '5px' }} />
+                          "{keywordResults.keyword}" in Scripture
+                        </h3>
+                        <button className="fetched-verse-close" onClick={() => setKeywordResults(null)}>
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                      {keywordResults.loading && (
+                        <p className="side-panel-text fetched-verse-loading">Searching...</p>
+                      )}
+                      {keywordResults.error && (
+                        <p className="side-panel-text fetched-verse-error">{keywordResults.error}</p>
+                      )}
+                      {keywordResults.results.length > 0 && (
+                        <div className="keyword-results-list">
+                          {keywordResults.results.map((r, i) => (
+                            <div key={i} className="keyword-result-item">
+                              <button
+                                className="keyword-result-ref"
+                                onClick={() => fetchVerse(r.reference)}
+                              >
+                                {r.reference}
+                              </button>
+                              <p
+                                className="keyword-result-text"
+                                dangerouslySetInnerHTML={{ __html: r.highlighted }}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {!keywordResults.loading && keywordResults.results.length === 0 && !keywordResults.error && (
+                        <p className="side-panel-text fetched-verse-loading">No results found</p>
+                      )}
+                    </section>
+                  )}
+                </>
+              )}
+
+              {/* ── Details Tab ── */}
+              {sideTab === 'details' && (
+                <>
+                  <section className="side-panel-section side-panel-grid">
+                    <h3 className="side-panel-label">Classification</h3>
+                    <div className="side-panel-field">
+                      <span className="side-panel-field-label">Duration</span>
+                      <span className="side-panel-field-value">{selectedLaw.duration_type?.replace(/_/g, ' ') || 'Not analyzed'}</span>
+                    </div>
+                    <div className="side-panel-field">
+                      <span className="side-panel-field-label">Applicability</span>
+                      <span className="side-panel-field-value">{selectedLaw.current_applicability?.replace(/_/g, ' ') || 'Not analyzed'}</span>
+                    </div>
+                    <div className="side-panel-field">
+                      <span className="side-panel-field-label">Regulated Party</span>
+                      <span className="side-panel-field-value">{selectedLaw.regulated_party || 'Not specified'}</span>
+                    </div>
+                    {selectedLaw.categories?.length > 0 && (
+                      <div className="side-panel-field">
+                        <span className="side-panel-field-label">Category</span>
+                        <span className="side-panel-field-value">
+                          {selectedLaw.categories.map(c => c.split(' > ').slice(1).join(' > ')).join('; ')}
+                        </span>
+                      </div>
+                    )}
+                  </section>
+
+                  {(selectedLaw.requires_temple || selectedLaw.requires_priesthood || selectedLaw.requires_land_israel) && (
+                    <section className="side-panel-section">
+                      <h3 className="side-panel-label">
+                        <Clock className="w-3.5 h-3.5" style={{ display: 'inline', marginRight: '5px' }} />
+                        Prerequisites
+                      </h3>
+                      {selectedLaw.requires_temple && selectedLaw.requires_temple !== 'no' && (
+                        <p className="side-panel-prereq">Temple: {selectedLaw.requires_temple}</p>
+                      )}
+                      {selectedLaw.requires_priesthood && selectedLaw.requires_priesthood !== 'no' && (
+                        <p className="side-panel-prereq">Priesthood: {selectedLaw.requires_priesthood}</p>
+                      )}
+                      {selectedLaw.requires_land_israel && selectedLaw.requires_land_israel !== 'no' && (
+                        <p className="side-panel-prereq">Land of Israel: {selectedLaw.requires_land_israel}</p>
+                      )}
+                    </section>
+                  )}
+
+                  {selectedLaw.classification_reasoning && (
+                    <section className="side-panel-section">
+                      <h3 className="side-panel-label">Reasoning</h3>
+                      <p className="side-panel-text">{selectedLaw.classification_reasoning}</p>
+                    </section>
+                  )}
+
+                  {selectedLaw.notes && (
+                    <section className="side-panel-section">
+                      <h3 className="side-panel-label">
+                        <MessageSquare className="w-3.5 h-3.5" style={{ display: 'inline', marginRight: '5px' }} />
+                        Notes
+                      </h3>
+                      <p className="side-panel-text">{selectedLaw.notes}</p>
+                    </section>
+                  )}
+
+                  <button
+                    className="side-panel-report-btn"
+                    onClick={() => {
+                      setFeedbackContext(`${selectedLaw.reference} — ${selectedLaw.law_summary}`)
+                      setFeedbackSent(false)
+                      setShowFeedback(true)
+                    }}
+                  >
+                    <Mail className="w-4 h-4" />
+                    Report Issue or Suggest Correction
+                  </button>
+                </>
+              )}
             </div>
           </>
         )}
