@@ -1211,37 +1211,16 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
         <span>Feedback</span>
       </button>
 
-      <div className="network-legend">
-        <div className="legend-title">
-          <Sparkles className="w-4 h-4" />
-          LEGEND
+      {onSwitchView && (
+        <div className="network-view-switches">
+          <button className="legend-view-btn" onClick={() => onSwitchView('list')}>
+            <List className="w-3.5 h-3.5" /> List
+          </button>
+          <button className="legend-view-btn" onClick={() => onSwitchView('stats')}>
+            <BarChart3 className="w-3.5 h-3.5" /> Stats
+          </button>
         </div>
-        <div className="legend-items">
-          <div className="legend-item">
-            <div className="legend-dot eternal"></div>
-            <span>Eternal</span>
-          </div>
-          <div className="legend-item">
-            <div className="legend-dot ongoing"></div>
-            <span>Ongoing</span>
-          </div>
-          <div className="legend-item">
-            <div className="legend-dot contextual"></div>
-            <span>Contextual</span>
-          </div>
-        </div>
-
-        {onSwitchView && (
-          <div className="legend-views">
-            <button className="legend-view-btn" onClick={() => onSwitchView('list')}>
-              <List className="w-3.5 h-3.5" /> List
-            </button>
-            <button className="legend-view-btn" onClick={() => onSwitchView('stats')}>
-              <BarChart3 className="w-3.5 h-3.5" /> Stats
-            </button>
-          </div>
-        )}
-      </div>
+      )}
 
       {/* Side Panel */}
       <div className={`side-panel ${selectedLaw ? 'open' : ''}`}>
