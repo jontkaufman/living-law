@@ -27,11 +27,11 @@ const MAX_LAWS_SHOWN = 80
 // ── Tree layout constants ────────────────────────────────────────────────────
 
 const ROOT_Y = 100
-const LEVEL2_Y = 340
-const LEVEL3_Y = 580
-const LEVEL4_Y = 820
-const LAW_Y_OFFSET = 240
-const LAW_ROW_HEIGHT = 28
+const LEVEL2_Y = 280
+const LEVEL3_Y = 460
+const LEVEL4_Y = 640
+const LAW_Y_OFFSET = 180
+const LAW_ROW_HEIGHT = 32
 const LAW_LIST_X_OFFSET = -20  // left of parent center
 
 const LOVE_GOD_X = 600
@@ -416,8 +416,8 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
     edges.push({ source: 'love-god', target: 'love-neighbor', subtle: true })
 
     // ─ Level 2 categories ─
-    const godSpacing = Math.max(120, 180 - godL2s.length * 5)
-    const neighborSpacing = Math.max(120, 180 - neighborL2s.length * 5)
+    const godSpacing = Math.max(140, 210 - godL2s.length * 5)
+    const neighborSpacing = Math.max(140, 210 - neighborL2s.length * 5)
     const godPositions = positionChildren(godL2s.length, LOVE_GOD_X, LEVEL2_Y, godSpacing)
     const neighborPositions = positionChildren(neighborL2s.length, LOVE_NEIGHBOR_X, LEVEL2_Y, neighborSpacing)
 
@@ -506,7 +506,7 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
       if (l3Keys.length === 0 && directLaws.length > 0) {
         addLawListNodes(`l2-${expandedL2}`, l2Pos.x, LEVEL3_Y, directLaws, parentConfig.color)
       } else {
-        const l3Spacing = Math.max(100, 160 - l3Keys.length * 4)
+        const l3Spacing = Math.max(115, 185 - l3Keys.length * 4)
         const l3Positions = positionChildren(l3Keys.length, l2Pos.x, LEVEL3_Y, l3Spacing)
         const l3PositionMap = {}
 
@@ -538,7 +538,7 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
               const allLaws = collectAllLaws(l3Data)
               addLawListNodes(`l3-${expandedL3}`, l3Pos.x, LEVEL4_Y, allLaws, parentConfig.color)
             } else {
-              const l4Spacing = Math.max(90, 150 - l4Keys.length * 4)
+              const l4Spacing = Math.max(105, 175 - l4Keys.length * 4)
               const l4Positions = positionChildren(l4Keys.length, l3Pos.x, LEVEL4_Y, l4Spacing)
               const l4PositionMap = {}
 
@@ -718,18 +718,18 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
         : node.type === 'level3' || node.type === 'level4' ? 0.6
         : 0.5
 
-      const fontSize = node.type === 'great-command' ? 14
-        : node.type === 'level2' ? 10
-        : node.type === 'level3' || node.type === 'level4' ? 9
-        : 8
+      const fontSize = node.type === 'great-command' ? 18
+        : node.type === 'level2' ? 14
+        : node.type === 'level3' || node.type === 'level4' ? 12
+        : 11
 
-      ctx.font = `${fontSize}px 'JetBrains Mono', monospace`
+      ctx.font = `${fontSize}px 'Inter', 'Segoe UI', system-ui, sans-serif`
       ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${labelAlpha})`
-      const labelY = node.y + node.coreRadius + 10
+      const labelY = node.y + node.coreRadius + 12
       ctx.fillText(node.label, node.x, labelY)
 
       if (node.sublabel) {
-        ctx.font = `${fontSize - 2}px 'JetBrains Mono', monospace`
+        ctx.font = `${fontSize - 2}px 'Inter', 'Segoe UI', system-ui, sans-serif`
         ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${labelAlpha * 0.65})`
         ctx.fillText(node.sublabel, node.x, labelY + fontSize + 3)
       }
@@ -760,13 +760,13 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
 
       // Reference (bold-ish)
       ctx.textAlign = 'left'
-      ctx.font = `bold 10px 'JetBrains Mono', monospace`
+      ctx.font = `600 13px 'Inter', 'Segoe UI', system-ui, sans-serif`
       ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`
       ctx.fillText(node.refLabel || '', node.x + 10, node.y)
 
       // Title
       const refWidth = node.refLabel ? ctx.measureText(node.refLabel).width + 12 : 0
-      ctx.font = `10px 'JetBrains Mono', monospace`
+      ctx.font = `12px 'Inter', 'Segoe UI', system-ui, sans-serif`
       ctx.fillStyle = `rgba(235, 225, 205, ${alpha * 0.8})`
       ctx.fillText(node.label, node.x + 10 + refWidth, node.y)
     })
