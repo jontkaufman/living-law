@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Search, Filter, BookOpen, BarChart3, Moon, Sun, Network } from 'lucide-react'
+import { supabase } from './lib/supabase'
 import LawList from './components/LawList'
 import LawDetail from './components/LawDetail'
 import FilterPanel from './components/FilterPanel'
@@ -21,11 +22,13 @@ function App() {
   const [darkMode, setDarkMode] = useState(false)
   const [view, setView] = useState('network') // network, list, stats
 
-  // Load laws data
+  // Load laws data from Supabase
   useEffect(() => {
-    fetch('/laws-data.json')
-      .then(res => res.json())
-      .then(data => setLaws(data))
+    supabase.rpc('get_frontend_laws')
+      .then(({ data, error }) => {
+        if (error) throw error
+        setLaws(data || [])
+      })
       .catch(err => console.error('Error loading laws:', err))
   }, [])
 

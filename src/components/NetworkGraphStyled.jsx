@@ -7,24 +7,18 @@ const FEEDBACK_API = '/api/feedback'
 // ── Level 2 category display config ──────────────────────────────────────────
 
 const LEVEL2_CONFIG = {
-  // LOVE_GOD children — warm gold/amber spectrum
-  'KNOW_FEAR_CLING':          { label: 'KNOW, FEAR & CLING', short: '(1)', color: [220, 190, 130] },
-  'NO_IDOLATRY':              { label: 'NO IDOLATRY', short: '(2)', color: [200, 170, 120] },
-  'GODS_NAME':                { label: "GOD'S NAME", short: '(3)', color: [210, 180, 125] },
-  'SACRED_TIMES':             { label: 'SACRED TIMES', short: '(4)', color: [230, 195, 140] },
-  'WORSHIP_AND_OFFERINGS':    { label: 'WORSHIP & OFFERINGS', color: [210, 165, 130] },
-  'PRIESTHOOD_AND_SANCTUARY': { label: 'PRIESTHOOD & SANCTUARY', color: [195, 175, 140] },
-  'PURITY_AND_HOLINESS':      { label: 'PURITY & HOLINESS', color: [205, 185, 145] },
-  'VOWS_AND_DEDICATIONS':     { label: 'VOWS & DEDICATIONS', color: [215, 175, 135] },
-  // LOVE_NEIGHBOR children — warm sage/earth spectrum
-  'HONOR_PARENTS':            { label: 'HONOR PARENTS', short: '(5)', color: [170, 195, 130] },
-  'NO_MURDER':                { label: 'DO NOT MURDER', short: '(6)', color: [155, 185, 125] },
-  'NO_ADULTERY':              { label: 'NO ADULTERY', short: '(7)', color: [185, 170, 130] },
-  'NO_STEALING':              { label: 'DO NOT STEAL', short: '(8)', color: [195, 180, 120] },
-  'NO_FALSE_WITNESS':         { label: 'NO FALSE WITNESS', short: '(9)', color: [190, 175, 125] },
-  'NO_COVETING':              { label: 'DO NOT COVET', short: '(10)', color: [180, 165, 120] },
-  'COMPASSION_AND_CARE':      { label: 'COMPASSION & CARE', color: [160, 190, 140] },
-  'WARFARE_AND_NATIONAL_LIFE':{ label: 'WARFARE & NATIONAL LIFE', color: [185, 170, 125] },
+  // LOVE GOD children (Ten Commandments 1-4) — warm gold/amber spectrum
+  'know-fear-cling':    { label: 'KNOW, FEAR & CLING', short: '(1)', color: [220, 190, 130] },
+  'no-idolatry':        { label: 'NO IDOLATRY', short: '(2)', color: [200, 170, 120] },
+  'gods-name':          { label: "GOD'S NAME", short: '(3)', color: [210, 180, 125] },
+  'sacred-times':       { label: 'SACRED TIMES', short: '(4)', color: [230, 195, 140] },
+  // LOVE NEIGHBOR children (Ten Commandments 5-10) — warm sage/earth spectrum
+  'honor-parents':      { label: 'HONOR PARENTS', short: '(5)', color: [170, 195, 130] },
+  'no-murder':          { label: 'DO NOT MURDER', short: '(6)', color: [155, 185, 125] },
+  'no-adultery':        { label: 'NO ADULTERY', short: '(7)', color: [185, 170, 130] },
+  'no-steal':           { label: 'DO NOT STEAL', short: '(8)', color: [195, 180, 120] },
+  'no-false-witness':   { label: 'NO FALSE WITNESS', short: '(9)', color: [190, 175, 125] },
+  'no-covet':           { label: 'DO NOT COVET', short: '(10)', color: [180, 165, 120] },
 }
 
 const SUBCATEGORY_THRESHOLD = 20
@@ -145,7 +139,7 @@ function drawStar(ctx, x, y, rgb, coreRadius, glowRadius, intensity = 1.0) {
 }
 
 function formatLabel(key) {
-  return key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+  return key.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
 }
 
 // ── Build hierarchy tree from category paths ─────────────────────────────────
@@ -362,7 +356,7 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
 
     // Build breadcrumbs
     const crumbs = ['Torah Laws']
-    if (rootKey) crumbs.push(rootKey === 'LOVE_GOD' ? 'LOVE YHWH' : 'LOVE NEIGHBOR')
+    if (rootKey) crumbs.push(rootKey === 'love-god' ? 'LOVE YHWH' : 'LOVE YOUR NEIGHBOR')
     if (l2Key) {
       const config = LEVEL2_CONFIG[l2Key]
       crumbs.push(config ? config.label : formatLabel(l2Key))
@@ -380,7 +374,7 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
     setTimeout(() => {
       const deepestLevel = l4Key ? LEVEL4_Y : l3Key ? LEVEL3_Y : LEVEL2_Y
       const lawY = deepestLevel + LAW_Y_OFFSET
-      const rootCenterX = rootKey === 'LOVE_GOD' ? LOVE_GOD_X : LOVE_NEIGHBOR_X
+      const rootCenterX = rootKey === 'love-god' ? LOVE_GOD_X : LOVE_NEIGHBOR_X
       focusOnArea(rootCenterX - 350, deepestLevel - 100, rootCenterX + 550, lawY + 300)
     }, 50)
   }, [onSelectLaw, focusOnArea])
@@ -395,31 +389,31 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
     const godL2s = []
     const neighborL2s = []
 
-    if (hierarchy['LOVE_GOD']) {
-      Object.keys(hierarchy['LOVE_GOD']._children).forEach(key => {
-        godL2s.push({ root: 'LOVE_GOD', key, ...hierarchy['LOVE_GOD']._children[key] })
+    if (hierarchy['love-god']) {
+      Object.keys(hierarchy['love-god']._children).forEach(key => {
+        godL2s.push({ root: 'love-god', key, ...hierarchy['love-god']._children[key] })
       })
     }
-    if (hierarchy['LOVE_NEIGHBOR']) {
-      Object.keys(hierarchy['LOVE_NEIGHBOR']._children).forEach(key => {
-        neighborL2s.push({ root: 'LOVE_NEIGHBOR', key, ...hierarchy['LOVE_NEIGHBOR']._children[key] })
+    if (hierarchy['love-neighbor']) {
+      Object.keys(hierarchy['love-neighbor']._children).forEach(key => {
+        neighborL2s.push({ root: 'love-neighbor', key, ...hierarchy['love-neighbor']._children[key] })
       })
     }
 
     // ─ Great commands ─
     nodes.push({
-      id: 'LOVE_GOD', label: 'LOVE YHWH', subtitle: 'with all your heart',
+      id: 'love-god', label: 'LOVE YHWH', subtitle: 'with all your heart',
       type: 'great-command', color: [220, 190, 130],
       coreRadius: 10, glowRadius: 60,
       x: LOVE_GOD_X, y: ROOT_Y,
     })
     nodes.push({
-      id: 'LOVE_NEIGHBOR', label: 'LOVE YOUR NEIGHBOR', subtitle: 'as yourself',
+      id: 'love-neighbor', label: 'LOVE YOUR NEIGHBOR', subtitle: 'as yourself',
       type: 'great-command', color: [170, 195, 130],
       coreRadius: 10, glowRadius: 60,
       x: LOVE_NEIGHBOR_X, y: ROOT_Y,
     })
-    edges.push({ source: 'LOVE_GOD', target: 'LOVE_NEIGHBOR', subtle: true })
+    edges.push({ source: 'love-god', target: 'love-neighbor', subtle: true })
 
     // ─ Level 2 categories ─
     const godSpacing = Math.max(120, 180 - godL2s.length * 5)
@@ -451,8 +445,8 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
       })
     }
 
-    addL2Nodes(godL2s, godPositions, 'LOVE_GOD')
-    addL2Nodes(neighborL2s, neighborPositions, 'LOVE_NEIGHBOR')
+    addL2Nodes(godL2s, godPositions, 'love-god')
+    addL2Nodes(neighborL2s, neighborPositions, 'love-neighbor')
 
     // ── Helper: add law list nodes vertically under a parent ──
     const addLawListNodes = (parentNodeId, parentX, startY, lawsArray, color) => {
@@ -501,7 +495,7 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
       const l2Pos = l2PositionMap[expandedL2]
       if (!l2Pos) { nodesRef.current = nodes; edgesRef.current = edges; return }
 
-      const rootKey = godL2s.find(l => l.key === expandedL2) ? 'LOVE_GOD' : 'LOVE_NEIGHBOR'
+      const rootKey = godL2s.find(l => l.key === expandedL2) ? 'love-god' : 'love-neighbor'
       const l2Node = hierarchy[rootKey]?._children[expandedL2]
       if (!l2Node) { nodesRef.current = nodes; edgesRef.current = edges; return }
 
@@ -829,10 +823,10 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
       setActivePath(new Set([node.id]))
       setBreadcrumbs(['Torah Laws'])
 
-      const centerX = node.id === 'LOVE_GOD' ? LOVE_GOD_X : LOVE_NEIGHBOR_X
-      const l2Count = node.id === 'LOVE_GOD'
-        ? Object.keys(hierarchy['LOVE_GOD']?._children || {}).length
-        : Object.keys(hierarchy['LOVE_NEIGHBOR']?._children || {}).length
+      const centerX = node.id === 'love-god' ? LOVE_GOD_X : LOVE_NEIGHBOR_X
+      const l2Count = node.id === 'love-god'
+        ? Object.keys(hierarchy['love-god']?._children || {}).length
+        : Object.keys(hierarchy['love-neighbor']?._children || {}).length
       const spread = l2Count * 90
       focusOnArea(centerX - spread - 50, ROOT_Y - 60, centerX + spread + 50, LEVEL2_Y + 100)
 
@@ -853,7 +847,7 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
         const rootId = node.rootId
         const config = LEVEL2_CONFIG[l2Key] || { label: formatLabel(l2Key) }
         setActivePath(buildActivePath(rootId, l2Key))
-        setBreadcrumbs(['Torah Laws', rootId === 'LOVE_GOD' ? 'LOVE YHWH' : 'LOVE NEIGHBOR', config.label])
+        setBreadcrumbs(['Torah Laws', rootId === 'love-god' ? 'LOVE YHWH' : 'LOVE NEIGHBOR', config.label])
 
         // Focus — if subcategories exist use horizontal spread, otherwise vertical law list
         const l2Data = hierarchy[rootId]?._children[l2Key]
