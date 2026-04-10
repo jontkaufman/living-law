@@ -21,6 +21,18 @@ const LEVEL2_CONFIG = {
   'no-covet':           { label: 'DO NOT COVET', short: '(10)', color: [180, 165, 120] },
 }
 
+// ── Observance classification config ────────────────────────────────────────
+
+const OBSERVANCE_CONFIG = {
+  already_observing:       { label: 'Christians Already Do',       symbol: '✔', color: '#6bcf7f' },
+  should_observe:          { label: 'Should Observe',              symbol: '★', color: '#e0c060' },
+  situational:             { label: 'Situational',                 symbol: '◇', color: '#8ca0b4' },
+  observe_in_principle:    { label: 'Observe in Principle',        symbol: '○', color: '#c8a878' },
+  cannot_currently_observe:{ label: 'Cannot Currently Observe',    symbol: '⦸', color: '#c08888' },
+  aware_in_principle:      { label: 'Aware in Principle',          symbol: '△', color: '#9a9a9a' },
+  voluntary:               { label: 'Voluntary',                   symbol: '♡', color: '#b090d0' },
+}
+
 const SUBCATEGORY_THRESHOLD = 20
 const MAX_LAWS_SHOWN = 80
 
@@ -186,6 +198,9 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
   const [searchQuery, setSearchQuery] = useState('')
   const [showSearch, setShowSearch] = useState(false)
   const searchInputRef = useRef(null)
+
+  // Observance legend state
+  const [showObservanceLegend, setShowObservanceLegend] = useState(false)
 
   // Verse lookup state
   const [fetchedVerse, setFetchedVerse] = useState(null)  // { reference, text, loading, error }
@@ -769,6 +784,18 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
       ctx.font = `18px 'Inter', 'Segoe UI', system-ui, sans-serif`
       ctx.fillStyle = `rgba(235, 225, 205, ${alpha * 0.8})`
       ctx.fillText(node.label, node.x + 14 + refWidth, node.y)
+
+      // Observance icon
+      const obsClass = node.data?.observance_class
+      const obsConfig = obsClass ? OBSERVANCE_CONFIG[obsClass] : null
+      if (obsConfig) {
+        const titleWidth = ctx.measureText(node.label).width
+        ctx.font = `14px 'Inter', 'Segoe UI', system-ui, sans-serif`
+        ctx.fillStyle = obsConfig.color
+        ctx.globalAlpha = alpha * 0.7
+        ctx.fillText(obsConfig.symbol, node.x + 14 + refWidth + titleWidth + 12, node.y)
+        ctx.globalAlpha = 1.0
+      }
     })
 
     ctx.restore()
@@ -1205,6 +1232,26 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
         <span>Feedback</span>
       </button>
 
+      {/* Observance Legend */}
+      <div className="observance-legend-container">
+        <button
+          className={`legend-toggle-btn ${showObservanceLegend ? 'active' : ''}`}
+          onClick={() => setShowObservanceLegend(v => !v)}
+        >
+          <Sparkles className="w-3.5 h-3.5" /> Observance
+        </button>
+        {showObservanceLegend && (
+          <div className="observance-legend">
+            {Object.entries(OBSERVANCE_CONFIG).map(([key, cfg]) => (
+              <div key={key} className="observance-legend-item">
+                <span className="observance-legend-symbol" style={{ color: cfg.color }}>{cfg.symbol}</span>
+                <span className="observance-legend-label">{cfg.label}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       {onSwitchView && (
         <div className="network-view-switches">
           <button className="legend-view-btn" onClick={() => onSwitchView('list')}>
@@ -1430,6 +1477,17 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
                       <span className="side-panel-field-label">Regulated Party</span>
                       <span className="side-panel-field-value">{selectedLaw.regulated_party || 'Not specified'}</span>
                     </div>
+                    {selectedLaw.observance_class && (
+                      <div className="side-panel-field">
+                        <span className="side-panel-field-label">Observance</span>
+                        <span className="side-panel-field-value side-panel-observance">
+                          <span style={{ color: OBSERVANCE_CONFIG[selectedLaw.observance_class]?.color }}>
+                            {OBSERVANCE_CONFIG[selectedLaw.observance_class]?.symbol}
+                          </span>
+                          {' '}{OBSERVANCE_CONFIG[selectedLaw.observance_class]?.label || selectedLaw.observance_class.replace(/_/g, ' ')}
+                        </span>
+                      </div>
+                    )}
                     {selectedLaw.categories?.length > 0 && (
                       <div className="side-panel-field">
                         <span className="side-panel-field-label">Category</span>
