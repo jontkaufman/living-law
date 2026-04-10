@@ -31,7 +31,7 @@ const LEVEL2_Y = 280
 const LEVEL3_Y = 460
 const LEVEL4_Y = 640
 const LAW_Y_OFFSET = 180
-const LAW_ROW_HEIGHT = 32
+const LAW_ROW_HEIGHT = 44
 const LAW_LIST_X_OFFSET = -20  // left of parent center
 
 const LOVE_GOD_X = 600
@@ -754,21 +754,21 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
 
       // Small dot
       ctx.beginPath()
-      ctx.arc(node.x, node.y, 3, 0, Math.PI * 2)
+      ctx.arc(node.x, node.y, 4, 0, Math.PI * 2)
       ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`
       ctx.fill()
 
       // Reference (bold-ish)
       ctx.textAlign = 'left'
-      ctx.font = `600 13px 'Inter', 'Segoe UI', system-ui, sans-serif`
+      ctx.font = `600 20px 'Inter', 'Segoe UI', system-ui, sans-serif`
       ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`
-      ctx.fillText(node.refLabel || '', node.x + 10, node.y)
+      ctx.fillText(node.refLabel || '', node.x + 14, node.y)
 
       // Title
-      const refWidth = node.refLabel ? ctx.measureText(node.refLabel).width + 12 : 0
-      ctx.font = `12px 'Inter', 'Segoe UI', system-ui, sans-serif`
+      const refWidth = node.refLabel ? ctx.measureText(node.refLabel).width + 14 : 0
+      ctx.font = `18px 'Inter', 'Segoe UI', system-ui, sans-serif`
       ctx.fillStyle = `rgba(235, 225, 205, ${alpha * 0.8})`
-      ctx.fillText(node.label, node.x + 10 + refWidth, node.y)
+      ctx.fillText(node.label, node.x + 14 + refWidth, node.y)
     })
 
     ctx.restore()
