@@ -1303,8 +1303,11 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
                         Related Verses
                       </h3>
                       <div className="side-panel-refs">
-                        {selectedLaw.other_torah_refs.split(/,\s*(?=[A-Z0-9])/).map((ref, i) => {
-                          const clean = ref.trim()
+                        {(Array.isArray(selectedLaw.other_torah_refs)
+                          ? selectedLaw.other_torah_refs
+                          : selectedLaw.other_torah_refs.split(/,\s*(?=[A-Z0-9])/)
+                        ).map((ref, i) => {
+                          const clean = (ref || '').trim()
                           if (!clean) return null
                           return (
                             <button key={i} className="verse-ref-btn" onClick={() => fetchVerse(clean)}>
