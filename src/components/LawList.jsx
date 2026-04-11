@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef } from 'react'
-import { ChevronRight, ChevronDown, Search, X, Network, List, Columns2, BarChart3, Mail, Sparkles, Sun, Moon } from 'lucide-react'
+import { ChevronRight, ChevronDown, Search, X, Network, List, Columns2, BarChart3, Mail, Sparkles, Sun, Moon, HelpCircle } from 'lucide-react'
 import LawSidePanel from './LawSidePanel'
 import {
   LEVEL2_CONFIG, OBSERVANCE_CONFIG, FEEDBACK_API,
@@ -8,7 +8,7 @@ import {
 } from '../lib/lawHelpers'
 import './LawList.css'
 
-function LawList({ laws, categoryMeta = {}, onSelectLaw, selectedLaw, onCloseLaw, onSwitchView, hideSidePanel, navState, onNavChange, lightMode, onToggleTheme }) {
+function LawList({ laws, categoryMeta = {}, onSelectLaw, selectedLaw, onCloseLaw, onSwitchView, hideSidePanel, navState, onNavChange, lightMode, onToggleTheme, onRestartTour }) {
   // Internal accordion state — used when not controlled by parent (standalone mode)
   const [_expandedRoot, _setExpandedRoot] = useState(null)
   const [_expandedL2, _setExpandedL2] = useState(null)
@@ -349,7 +349,7 @@ function LawList({ laws, categoryMeta = {}, onSelectLaw, selectedLaw, onCloseLaw
           </div>
         </div>
 
-        <div className="accordion-header-right">
+        <div className="accordion-header-right" data-tour="view-switchers">
           {onSwitchView && (
             <>
               <button className="nav-btn" onClick={() => onSwitchView('network')} title="Network view">
@@ -373,6 +373,15 @@ function LawList({ laws, categoryMeta = {}, onSelectLaw, selectedLaw, onCloseLaw
           >
             {lightMode ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
           </button>
+          {onRestartTour && (
+            <button
+              className="nav-btn"
+              onClick={onRestartTour}
+              title="Restart Tour"
+            >
+              <HelpCircle className="w-4 h-4" />
+            </button>
+          )}
         </div>
       </div>
 
