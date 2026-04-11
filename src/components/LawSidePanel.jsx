@@ -125,7 +125,7 @@ function LawSidePanel({ selectedLaw, onCloseLaw }) {
 
                   <section className="side-panel-section">
                     <h3 className="side-panel-label">Law Summary</h3>
-                    <p className="side-panel-text">{selectedLaw.law_summary}</p>
+                    <p className="side-panel-text">{selectedLaw.law_summary || selectedLaw.preview || 'No summary available'}</p>
                   </section>
 
                   {(selectedLaw.has_forever_language || selectedLaw.has_generational_language) && (
