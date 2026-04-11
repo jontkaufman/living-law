@@ -244,6 +244,12 @@
   gap: 6px;
 }
 
+.network-header-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .legend-view-btn {
   display: flex;
   align-items: center;
