@@ -1,9 +1,9 @@
 import { useMemo } from 'react'
-import { Network, List, Columns2, BarChart3, BookOpen, Sparkles, Users, Clock, Sun, Moon } from 'lucide-react'
+import { Network, List, Columns2, BarChart3, BookOpen, Sparkles, Users, Clock, Sun, Moon, HelpCircle } from 'lucide-react'
 import { OBSERVANCE_CONFIG, LEVEL2_CONFIG, buildHierarchyTree, countAllLaws, getSortedChildren } from '../lib/lawHelpers'
 import './StatsOverview.css'
 
-function StatsOverview({ laws, categoryMeta = {}, onSwitchView, lightMode, onToggleTheme }) {
+function StatsOverview({ laws, categoryMeta = {}, onSwitchView, lightMode, onToggleTheme, onRestartTour }) {
   const totalLaws = laws.length
 
   const stats = useMemo(() => {
@@ -127,6 +127,15 @@ function StatsOverview({ laws, categoryMeta = {}, onSwitchView, lightMode, onTog
           >
             {lightMode ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
           </button>
+          {onRestartTour && (
+            <button
+              className="nav-btn"
+              onClick={onRestartTour}
+              title="Restart Tour"
+            >
+              <HelpCircle className="w-4 h-4" />
+            </button>
+          )}
         </div>
       </div>
 
