@@ -278,8 +278,8 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
     edges.push({ source: 'love-god', target: 'love-neighbor', subtle: true })
 
     // ─ Level 2 categories ─
-    const godSpacing = Math.max(140, 210 - godL2s.length * 5)
-    const neighborSpacing = Math.max(140, 210 - neighborL2s.length * 5)
+    const godSpacing = Math.max(180, 260 - godL2s.length * 5)
+    const neighborSpacing = Math.max(180, 260 - neighborL2s.length * 5)
     const godPositions = positionChildren(godL2s.length, LOVE_GOD_X, LEVEL2_Y, godSpacing)
     const neighborPositions = positionChildren(neighborL2s.length, LOVE_NEIGHBOR_X, LEVEL2_Y, neighborSpacing)
 
