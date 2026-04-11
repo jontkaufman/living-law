@@ -1,8 +1,12 @@
 import { useState, useEffect, useMemo } from 'react'
+import { Joyride } from 'react-joyride'
 import { supabase } from './lib/supabase'
 import LawList from './components/LawList'
 import StatsOverview from './components/StatsOverview'
 import NetworkGraphStyled from './components/NetworkGraphStyled'
+import { tourSteps } from './lib/tourSteps'
+import { getTourStyles } from './lib/tourStyles'
+import TourTooltip from './components/TourTooltip'
 
 function App() {
   const [laws, setLaws] = useState([])
@@ -20,6 +24,11 @@ function App() {
     expandedL4: null,
   })
 
+  // Tour state management
+  const [runTour, setRunTour] = useState(() => {
+    return !localStorage.getItem('torahLawsTourCompleted')
+  })
+
   // Load laws and category metadata from Supabase
   useEffect(() => {
     Promise.all([
@@ -35,62 +44,43 @@ function App() {
       .catch(err => console.error('Error loading data:', err))
   }, [])
 
-  // ── Network view: full-screen ──
-  if (view === 'network') {
-    return (
-      <div className={`network-fullscreen${lightMode ? ' light' : ''}`}>
-        <NetworkGraphStyled
-          laws={laws}
-          categoryMeta={categoryMeta}
-          onSelectLaw={setSelectedLaw}
-          selectedLaw={selectedLaw}
-          onCloseLaw={() => setSelectedLaw(null)}
-          onSwitchView={setView}
-          lightMode={lightMode}
-          onToggleTheme={toggleTheme}
-        />
-      </div>
-    )
+  const handleJoyrideCallback = (data) => {
+    const { status } = data
+
+    // Tour finished or skipped
+    if (status === 'finished' || status === 'skipped') {
+      localStorage.setItem('torahLawsTourCompleted', 'true')
+      setRunTour(false)
+    }
   }
 
-  // ── List view: full-screen accordion ──
-  if (view === 'list') {
-    return (
-      <div className={`network-fullscreen${lightMode ? ' light' : ''}`}>
-        <LawList
-          laws={laws}
-          categoryMeta={categoryMeta}
-          onSelectLaw={setSelectedLaw}
-          selectedLaw={selectedLaw}
-          onCloseLaw={() => setSelectedLaw(null)}
-          onSwitchView={setView}
-          lightMode={lightMode}
-          onToggleTheme={toggleTheme}
-        />
-      </div>
-    )
+  const handleRestartTour = () => {
+    localStorage.removeItem('torahLawsTourCompleted')
+    setRunTour(true)
   }
 
-  // ── Split view: accordion left 40%, network right 60% ──
-  if (view === 'split') {
-    return (
-      <div className={`split-fullscreen${lightMode ? ' light' : ''}`}>
-        <div className="split-left">
-          <LawList
-            laws={laws}
-            categoryMeta={categoryMeta}
-            onSelectLaw={setSelectedLaw}
-            selectedLaw={selectedLaw}
-            onCloseLaw={() => setSelectedLaw(null)}
-            onSwitchView={setView}
-            hideSidePanel
-            navState={navState}
-            onNavChange={setNavState}
-            lightMode={lightMode}
-            onToggleTheme={toggleTheme}
-          />
-        </div>
-        <div className="split-right">
+  return (
+    <>
+      <Joyride
+        steps={tourSteps}
+        run={runTour}
+        continuous={true}
+        showProgress={true}
+        showSkipButton={true}
+        disableScrolling={true}
+        spotlightClicks={false}
+        styles={getTourStyles(lightMode)}
+        callback={handleJoyrideCallback}
+        tooltipComponent={TourTooltip}
+        floaterProps={{
+          disableAnimation: false,
+          placement: 'auto'
+        }}
+      />
+
+      {/* ── Network view: full-screen ── */}
+      {view === 'network' && (
+        <div className={`network-fullscreen${lightMode ? ' light' : ''}`}>
           <NetworkGraphStyled
             laws={laws}
             categoryMeta={categoryMeta}
@@ -98,27 +88,81 @@ function App() {
             selectedLaw={selectedLaw}
             onCloseLaw={() => setSelectedLaw(null)}
             onSwitchView={setView}
-            navState={navState}
-            onNavChange={setNavState}
             lightMode={lightMode}
             onToggleTheme={toggleTheme}
+            onRestartTour={handleRestartTour}
           />
         </div>
-      </div>
-    )
-  }
+      )}
 
-  // ── Stats view: full-screen dark themed ──
-  return (
-    <div className={`network-fullscreen${lightMode ? ' light' : ''}`}>
-      <StatsOverview
-        laws={laws}
-        categoryMeta={categoryMeta}
-        onSwitchView={setView}
-        lightMode={lightMode}
-        onToggleTheme={toggleTheme}
-      />
-    </div>
+      {/* ── List view: full-screen accordion ── */}
+      {view === 'list' && (
+        <div className={`network-fullscreen${lightMode ? ' light' : ''}`}>
+          <LawList
+            laws={laws}
+            categoryMeta={categoryMeta}
+            onSelectLaw={setSelectedLaw}
+            selectedLaw={selectedLaw}
+            onCloseLaw={() => setSelectedLaw(null)}
+            onSwitchView={setView}
+            lightMode={lightMode}
+            onToggleTheme={toggleTheme}
+            onRestartTour={handleRestartTour}
+          />
+        </div>
+      )}
+
+      {/* ── Split view: accordion left 40%, network right 60% ── */}
+      {view === 'split' && (
+        <div className={`split-fullscreen${lightMode ? ' light' : ''}`}>
+          <div className="split-left">
+            <LawList
+              laws={laws}
+              categoryMeta={categoryMeta}
+              onSelectLaw={setSelectedLaw}
+              selectedLaw={selectedLaw}
+              onCloseLaw={() => setSelectedLaw(null)}
+              onSwitchView={setView}
+              hideSidePanel
+              navState={navState}
+              onNavChange={setNavState}
+              lightMode={lightMode}
+              onToggleTheme={toggleTheme}
+              onRestartTour={handleRestartTour}
+            />
+          </div>
+          <div className="split-right">
+            <NetworkGraphStyled
+              laws={laws}
+              categoryMeta={categoryMeta}
+              onSelectLaw={setSelectedLaw}
+              selectedLaw={selectedLaw}
+              onCloseLaw={() => setSelectedLaw(null)}
+              onSwitchView={setView}
+              navState={navState}
+              onNavChange={setNavState}
+              lightMode={lightMode}
+              onToggleTheme={toggleTheme}
+              onRestartTour={handleRestartTour}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* ── Stats view: full-screen dark themed ── */}
+      {view === 'stats' && (
+        <div className={`network-fullscreen${lightMode ? ' light' : ''}`}>
+          <StatsOverview
+            laws={laws}
+            categoryMeta={categoryMeta}
+            onSwitchView={setView}
+            lightMode={lightMode}
+            onToggleTheme={toggleTheme}
+            onRestartTour={handleRestartTour}
+          />
+        </div>
+      )}
+    </>
   )
 }
 
