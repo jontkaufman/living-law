@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { Network, List, Columns2, BookOpen, Sparkles, Users, Clock, Sun, Moon } from 'lucide-react'
+import { Network, List, Columns2, BarChart3, BookOpen, Sparkles, Users, Clock, Sun, Moon } from 'lucide-react'
 import { OBSERVANCE_CONFIG, LEVEL2_CONFIG, buildHierarchyTree, countAllLaws } from '../lib/lawHelpers'
 import './StatsOverview.css'
 
@@ -57,13 +57,20 @@ function StatsOverview({ laws, onSwitchView, lightMode, onToggleTheme }) {
         const config = LEVEL2_CONFIG[key]
         l2Counts.push({
           key,
-          label: config ? `${config.label} ${config.short}` : key,
+          label: config?.short ? `${config.short} - ${config.label}` : config?.label || key,
           count: countAllLaws(node),
           color: config?.color || [160, 160, 160],
+          sortNum: config?.short ? parseInt(config.short) : Infinity,
         })
       })
     })
-    l2Counts.sort((a, b) => b.count - a.count)
+    // Sort by commandment number (1-10), then by count for non-commandments
+    l2Counts.sort((a, b) => {
+      if (a.sortNum !== Infinity && b.sortNum !== Infinity) return a.sortNum - b.sortNum
+      if (a.sortNum !== Infinity) return -1
+      if (b.sortNum !== Infinity) return 1
+      return b.count - a.count
+    })
 
     return { loveGod, loveNeighbor, l2Counts }
   }, [laws])
@@ -106,14 +113,17 @@ function StatsOverview({ laws, onSwitchView, lightMode, onToggleTheme }) {
         <div className="stats-header-right">
           {onSwitchView && (
             <>
+              <button className="nav-btn" onClick={() => onSwitchView('network')} title="Network view">
+                <Network className="w-4 h-4" />
+              </button>
               <button className="nav-btn" onClick={() => onSwitchView('list')} title="List view">
                 <List className="w-4 h-4" />
               </button>
               <button className="nav-btn" onClick={() => onSwitchView('split')} title="Split view">
                 <Columns2 className="w-4 h-4" />
               </button>
-              <button className="nav-btn" onClick={() => onSwitchView('network')} title="Network view">
-                <Network className="w-4 h-4" />
+              <button className="nav-btn active" title="Dashboard (active)">
+                <BarChart3 className="w-4 h-4" />
               </button>
             </>
           )}

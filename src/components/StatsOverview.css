@@ -307,21 +307,33 @@
 }
 
 .stats-container.light .stats-subtitle {
-  color: rgba(100, 80, 50, 0.65);
+  color: rgba(70, 56, 35, 0.75);
 }
 
 /* Nav buttons */
 .stats-container.light .nav-btn {
   background: rgba(160, 140, 100, 0.08);
   border-color: rgba(160, 140, 100, 0.15);
-  color: rgba(100, 80, 50, 0.6);
+  color: rgba(60, 48, 30, 0.75);
 }
 
 .stats-container.light .nav-btn:hover {
   background: rgba(160, 140, 100, 0.15);
   border-color: rgba(160, 140, 100, 0.25);
-  color: rgba(80, 60, 30, 0.85);
+  color: rgba(40, 30, 15, 0.95);
   box-shadow: none;
+}
+
+.stats-container.light .nav-btn.active {
+  background: rgba(160, 140, 100, 0.2);
+  border-color: rgba(160, 140, 100, 0.45);
+  color: #6a5020;
+}
+
+.stats-container.light .nav-btn.active:hover {
+  background: rgba(160, 140, 100, 0.25);
+  border-color: rgba(160, 140, 100, 0.55);
+  color: #5a4010;
 }
 
 /* Scrollbar */
@@ -340,11 +352,11 @@
 }
 
 .stats-container.light .stats-metric-value {
-  color: #3d3520;
+  color: #2a2210;
 }
 
 .stats-container.light .stats-metric-label {
-  color: rgba(100, 80, 50, 0.6);
+  color: rgba(70, 56, 35, 0.75);
 }
 
 .stats-container.light .stats-metric-gold {
@@ -376,7 +388,7 @@
 }
 
 .stats-container.light .stats-prereq-label {
-  color: rgba(100, 80, 50, 0.6);
+  color: rgba(70, 56, 35, 0.75);
 }
 
 /* Cards */
@@ -391,7 +403,7 @@
 
 /* Bar chart */
 .stats-container.light .stats-bar-label {
-  color: rgba(60, 50, 30, 0.8);
+  color: rgba(40, 32, 20, 0.9);
 }
 
 .stats-container.light .stats-bar-track {
@@ -400,11 +412,11 @@
 }
 
 .stats-container.light .stats-bar-value {
-  color: #3d3520;
+  color: #2a2210;
 }
 
 .stats-container.light .stats-bar-pct {
-  color: rgba(100, 80, 50, 0.55);
+  color: rgba(70, 56, 35, 0.7);
 }
 
 /* ── Responsive ── */

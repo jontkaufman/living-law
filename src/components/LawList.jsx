@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef } from 'react'
-import { ChevronRight, ChevronDown, Search, X, Network, BarChart3, Columns2, Mail, Sparkles, Sun, Moon } from 'lucide-react'
+import { ChevronRight, ChevronDown, Search, X, Network, List, Columns2, BarChart3, Mail, Sparkles, Sun, Moon } from 'lucide-react'
 import LawSidePanel from './LawSidePanel'
 import {
   LEVEL2_CONFIG, OBSERVANCE_CONFIG, FEEDBACK_API,
@@ -39,6 +39,9 @@ function LawList({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwitchView, hid
   const [searchQuery, setSearchQuery] = useState('')
   const [showSearch, setShowSearch] = useState(false)
   const searchInputRef = useRef(null)
+
+  // Observance Legend
+  const [showObservanceLegend, setShowObservanceLegend] = useState(false)
 
   // Feedback
   const [showFeedback, setShowFeedback] = useState(false)
@@ -354,13 +357,16 @@ function LawList({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwitchView, hid
         <div className="accordion-header-right">
           {onSwitchView && (
             <>
-              <button className="nav-btn" onClick={() => onSwitchView('split')} title="Split view">
-                <Columns2 className="w-4 h-4" />
-              </button>
               <button className="nav-btn" onClick={() => onSwitchView('network')} title="Network view">
                 <Network className="w-4 h-4" />
               </button>
-              <button className="nav-btn" onClick={() => onSwitchView('stats')} title="Stats view">
+              <button className="nav-btn active" title="List view (active)">
+                <List className="w-4 h-4" />
+              </button>
+              <button className="nav-btn" onClick={() => onSwitchView('split')} title="Split view">
+                <Columns2 className="w-4 h-4" />
+              </button>
+              <button className="nav-btn" onClick={() => onSwitchView('stats')} title="Dashboard">
                 <BarChart3 className="w-4 h-4" />
               </button>
             </>
@@ -400,7 +406,13 @@ function LawList({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwitchView, hid
 
               {isRootOpen && (
                 <div className="accordion-root-content">
-                  {l2Keys.map(l2Key => {
+                  {l2Keys.sort((a, b) => {
+                    const configA = LEVEL2_CONFIG[a]
+                    const configB = LEVEL2_CONFIG[b]
+                    const numA = configA?.short ? parseInt(configA.short) : Infinity
+                    const numB = configB?.short ? parseInt(configB.short) : Infinity
+                    return numA - numB
+                  }).map(l2Key => {
                     const l2Data = root.node._children[l2Key]
                     const l2Count = countAllLaws(l2Data)
                     const config = LEVEL2_CONFIG[l2Key] || { label: formatLabel(l2Key), short: '', color: [148, 163, 184] }
@@ -418,8 +430,7 @@ function LawList({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwitchView, hid
                             {isL2Open ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
                           </span>
                           <span className="accordion-row-label">
-                            {config.label}
-                            {config.short && <span className="accordion-l2-num"> {config.short}</span>}
+                            {config.short ? `${config.short} - ${config.label}` : config.label}
                           </span>
                           <span className="accordion-row-count">{l2Count} {l2Count === 1 ? 'law' : 'laws'}</span>
                         </button>
@@ -517,6 +528,26 @@ function LawList({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwitchView, hid
           </div>
         </div>
       )}
+
+      {/* Observance Legend */}
+      <div className="observance-legend-container">
+        <button
+          className={`legend-toggle-btn ${showObservanceLegend ? 'active' : ''}`}
+          onClick={() => setShowObservanceLegend(v => !v)}
+        >
+          <Sparkles className="w-3.5 h-3.5" /> Observance
+        </button>
+        {showObservanceLegend && (
+          <div className="observance-legend">
+            {Object.entries(OBSERVANCE_CONFIG).map(([key, cfg]) => (
+              <div key={key} className="observance-legend-item">
+                <span className="observance-legend-symbol" style={{ color: cfg.color }}>{cfg.symbol}</span>
+                <span className="observance-legend-label">{cfg.label}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Side panel — hidden in split view (network panel handles it) */}
       {!hideSidePanel && <LawSidePanel selectedLaw={selectedLaw} onCloseLaw={onCloseLaw} />}

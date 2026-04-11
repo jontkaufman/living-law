@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react'
-import { ChevronLeft, Sparkles, Search, X, List, Columns2, BarChart3, Sun, Moon } from 'lucide-react'
+import { ChevronLeft, Sparkles, Search, X, Network, List, Columns2, BarChart3, Sun, Moon } from 'lucide-react'
 import LawSidePanel from './LawSidePanel'
 import {
   LEVEL2_CONFIG, OBSERVANCE_CONFIG,
@@ -251,6 +251,17 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
       })
     }
 
+    // Sort by commandment number (1-10 order)
+    const sortByNumber = (a, b) => {
+      const configA = LEVEL2_CONFIG[a.key]
+      const configB = LEVEL2_CONFIG[b.key]
+      const numA = configA?.short ? parseInt(configA.short) : Infinity
+      const numB = configB?.short ? parseInt(configB.short) : Infinity
+      return numA - numB
+    }
+    godL2s.sort(sortByNumber)
+    neighborL2s.sort(sortByNumber)
+
     // ─ Great commands ─
     nodes.push({
       id: 'love-god', label: 'LOVE YHWH', subtitle: 'with all your heart',
@@ -283,8 +294,7 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
         const pos = positions[i]
         l2PositionMap[l2.key] = pos
 
-        let label = config.label
-        if (config.short) label += ` ${config.short}`
+        let label = config.short ? `${config.short} - ${config.label}` : config.label
 
         nodes.push({
           id: nodeId, label, sublabel: `${count} laws`,
@@ -1216,13 +1226,16 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
         <div className="network-header-switches">
           {onSwitchView && (
             <>
+              <button className="nav-btn active" title="Network view (active)">
+                <Network className="w-4 h-4" />
+              </button>
               <button className="nav-btn" onClick={() => onSwitchView('list')} title="List view">
                 <List className="w-4 h-4" />
               </button>
               <button className="nav-btn" onClick={() => onSwitchView('split')} title="Split view">
                 <Columns2 className="w-4 h-4" />
               </button>
-              <button className="nav-btn" onClick={() => onSwitchView('stats')} title="Stats">
+              <button className="nav-btn" onClick={() => onSwitchView('stats')} title="Dashboard">
                 <BarChart3 className="w-4 h-4" />
               </button>
             </>

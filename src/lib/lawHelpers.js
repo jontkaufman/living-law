@@ -6,17 +6,17 @@ export const FEEDBACK_API = '/api/feedback'
 
 export const LEVEL2_CONFIG = {
   // LOVE GOD children (Ten Commandments 1-4) — warm gold/amber spectrum
-  'know-fear-cling':    { label: 'KNOW, FEAR & CLING', short: '(1)', color: [220, 190, 130] },
-  'no-idolatry':        { label: 'NO IDOLATRY', short: '(2)', color: [200, 170, 120] },
-  'gods-name':          { label: "GOD'S NAME", short: '(3)', color: [210, 180, 125] },
-  'sacred-times':       { label: 'SACRED TIMES', short: '(4)', color: [230, 195, 140] },
+  'know-fear-cling':    { label: 'No Other Gods', short: '1', color: [220, 190, 130] },
+  'no-idolatry':        { label: 'No Idols', short: '2', color: [200, 170, 120] },
+  'gods-name':          { label: "Do not take Yahweh's name in vain", short: '3', color: [210, 180, 125] },
+  'sacred-times':       { label: 'Honor the Sabbath', short: '4', color: [230, 195, 140] },
   // LOVE NEIGHBOR children (Ten Commandments 5-10) — warm sage/earth spectrum
-  'honor-parents':      { label: 'HONOR PARENTS', short: '(5)', color: [170, 195, 130] },
-  'no-murder':          { label: 'DO NOT MURDER', short: '(6)', color: [155, 185, 125] },
-  'no-adultery':        { label: 'NO ADULTERY', short: '(7)', color: [185, 170, 130] },
-  'no-steal':           { label: 'DO NOT STEAL', short: '(8)', color: [195, 180, 120] },
-  'no-false-witness':   { label: 'NO FALSE WITNESS', short: '(9)', color: [190, 175, 125] },
-  'no-covet':           { label: 'DO NOT COVET', short: '(10)', color: [180, 165, 120] },
+  'honor-parents':      { label: 'Honor your parents', short: '5', color: [170, 195, 130] },
+  'no-murder':          { label: 'You shall not murder', short: '6', color: [155, 185, 125] },
+  'no-adultery':        { label: 'You shall not commit adultery', short: '7', color: [185, 170, 130] },
+  'no-steal':           { label: 'You shall not steal', short: '8', color: [195, 180, 120] },
+  'no-false-witness':   { label: 'You shall not bear false witness', short: '9', color: [190, 175, 125] },
+  'no-covet':           { label: 'You shall not covet', short: '10', color: [180, 165, 120] },
 }
 
 // ── Observance classification config ────────────────────────────────────────

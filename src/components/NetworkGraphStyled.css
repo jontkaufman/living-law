@@ -143,6 +143,19 @@
   box-shadow: 0 0 12px rgba(var(--gold), 0.1);
 }
 
+.nav-btn.active {
+  background: rgba(var(--gold), 0.15);
+  border-color: rgba(var(--gold), 0.4);
+  color: rgba(var(--gold-bright), 1);
+  box-shadow: 0 0 12px rgba(var(--gold), 0.15);
+}
+
+.nav-btn.active:hover {
+  background: rgba(var(--gold), 0.18);
+  border-color: rgba(var(--gold), 0.5);
+  color: rgba(var(--gold-bright), 1);
+}
+
 .breadcrumbs {
   font-family: 'JetBrains Mono', monospace;
   font-size: 10px;
@@ -1140,44 +1153,57 @@
 
 /* Breadcrumbs */
 .network-container.light .breadcrumb .sep {
-  color: rgba(120, 100, 70, 0.3);
+  color: rgba(100, 80, 50, 0.4);
 }
 
 .network-container.light .breadcrumb-btn {
-  color: rgba(100, 80, 50, 0.5);
+  color: rgba(60, 48, 30, 0.7);
 }
 
 .network-container.light .breadcrumb-btn:hover:not(:disabled) {
-  color: rgba(80, 60, 30, 0.85);
+  color: rgba(40, 30, 15, 0.95);
 }
 
 .network-container.light .breadcrumb-btn.active {
-  color: rgba(80, 60, 30, 0.85);
+  color: rgba(40, 30, 15, 0.95);
 }
 
 /* Nav buttons */
 .network-container.light .nav-btn {
   background: rgba(160, 140, 100, 0.08);
   border-color: rgba(160, 140, 100, 0.15);
-  color: rgba(100, 80, 50, 0.6);
+  color: rgba(60, 48, 30, 0.75);
 }
 
 .network-container.light .nav-btn:hover {
   background: rgba(160, 140, 100, 0.15);
   border-color: rgba(160, 140, 100, 0.25);
-  color: rgba(80, 60, 30, 0.85);
+  color: rgba(40, 30, 15, 0.95);
   box-shadow: none;
+}
+
+.network-container.light .nav-btn.active {
+  background: rgba(160, 140, 100, 0.2);
+  border-color: rgba(160, 140, 100, 0.45);
+  color: #6a5020;
+  box-shadow: none;
+}
+
+.network-container.light .nav-btn.active:hover {
+  background: rgba(160, 140, 100, 0.25);
+  border-color: rgba(160, 140, 100, 0.55);
+  color: #5a4010;
 }
 
 /* Search */
 .network-container.light .search-input {
   background: rgba(255, 255, 255, 0.8);
   border-color: rgba(160, 140, 100, 0.2);
-  color: #3d3520;
+  color: #2a2210;
 }
 
 .network-container.light .search-input::placeholder {
-  color: rgba(100, 80, 50, 0.35);
+  color: rgba(80, 65, 40, 0.5);
 }
 
 .network-container.light .search-input:focus {
@@ -1187,11 +1213,11 @@
 }
 
 .network-container.light .search-icon {
-  color: rgba(100, 80, 50, 0.35);
+  color: rgba(80, 65, 40, 0.5);
 }
 
 .network-container.light .search-close {
-  color: rgba(100, 80, 50, 0.4);
+  color: rgba(80, 65, 40, 0.6);
 }
 
 .network-container.light .search-dropdown {
@@ -1209,32 +1235,32 @@
 }
 
 .network-container.light .search-result-title {
-  color: rgba(60, 50, 30, 0.6);
+  color: rgba(40, 32, 20, 0.75);
 }
 
 .network-container.light .search-no-results {
-  color: rgba(100, 80, 50, 0.4);
+  color: rgba(80, 65, 40, 0.6);
 }
 
 /* Hint bar */
 .network-container.light .network-hint {
   background: rgba(248, 245, 240, 0.8);
   border-color: rgba(160, 140, 100, 0.12);
-  color: rgba(100, 80, 50, 0.4);
+  color: rgba(80, 65, 40, 0.6);
 }
 
 /* Observance legend */
 .network-container.light .legend-toggle-btn {
   background: rgba(160, 140, 100, 0.08);
   border-color: rgba(160, 140, 100, 0.18);
-  color: rgba(80, 60, 30, 0.75);
+  color: rgba(50, 40, 20, 0.85);
 }
 
 .network-container.light .legend-toggle-btn:hover,
 .network-container.light .legend-toggle-btn.active {
   background: rgba(160, 140, 100, 0.14);
   border-color: rgba(160, 140, 100, 0.25);
-  color: rgba(60, 40, 15, 0.9);
+  color: rgba(30, 22, 10, 0.95);
 }
 
 .network-container.light .observance-legend {
@@ -1244,20 +1270,20 @@
 }
 
 .network-container.light .observance-legend-label {
-  color: rgba(50, 40, 20, 0.8);
+  color: rgba(30, 22, 10, 0.9);
 }
 
 /* Feedback button */
 .network-container.light .feedback-btn {
   background: rgba(255, 255, 255, 0.7);
   border-color: rgba(160, 140, 100, 0.18);
-  color: rgba(80, 60, 30, 0.75);
+  color: rgba(50, 40, 20, 0.85);
 }
 
 .network-container.light .feedback-btn:hover {
   background: rgba(255, 255, 255, 0.9);
   border-color: rgba(160, 140, 100, 0.3);
-  color: rgba(60, 40, 15, 0.9);
+  color: rgba(30, 22, 10, 0.95);
   box-shadow: none;
 }
 
@@ -1272,18 +1298,18 @@
 }
 
 .network-container.light .side-panel-title {
-  color: #2a2210;
+  color: #1a1408;
 }
 
 .network-container.light .side-panel-close {
   background: rgba(160, 140, 100, 0.06);
   border-color: rgba(160, 140, 100, 0.12);
-  color: rgba(100, 80, 50, 0.5);
+  color: rgba(70, 56, 35, 0.7);
 }
 
 .network-container.light .side-panel-close:hover {
   background: rgba(160, 140, 100, 0.12);
-  color: rgba(80, 60, 30, 0.8);
+  color: rgba(40, 30, 15, 0.9);
 }
 
 .network-container.light .side-panel-tabs {
@@ -1291,16 +1317,16 @@
 }
 
 .network-container.light .side-panel-tab {
-  color: rgba(70, 55, 30, 0.55);
+  color: rgba(50, 38, 20, 0.75);
 }
 
 .network-container.light .side-panel-tab:hover {
-  color: rgba(50, 38, 15, 0.85);
+  color: rgba(30, 22, 10, 0.95);
   background: rgba(160, 140, 100, 0.05);
 }
 
 .network-container.light .side-panel-tab.active {
-  color: #8a6d30;
+  color: #6a5020;
   border-bottom-color: rgba(160, 140, 100, 0.5);
 }
 
@@ -1318,11 +1344,11 @@
 }
 
 .network-container.light .side-panel-text {
-  color: rgba(35, 28, 14, 0.88);
+  color: rgba(25, 18, 8, 0.92);
 }
 
 .network-container.light .side-panel-ref {
-  color: rgba(70, 55, 30, 0.65);
+  color: rgba(50, 38, 20, 0.8);
 }
 
 .network-container.light .side-panel-field {
@@ -1330,11 +1356,11 @@
 }
 
 .network-container.light .side-panel-field-label {
-  color: rgba(70, 55, 30, 0.65);
+  color: rgba(50, 38, 20, 0.8);
 }
 
 .network-container.light .side-panel-field-value {
-  color: rgba(35, 28, 14, 0.88);
+  color: rgba(25, 18, 8, 0.92);
 }
 
 .network-container.light .side-panel-eternal {
@@ -1378,13 +1404,13 @@
 .network-container.light .side-panel-report-btn {
   background: rgba(160, 140, 100, 0.06);
   border-color: rgba(160, 140, 100, 0.12);
-  color: rgba(100, 80, 50, 0.55);
+  color: rgba(70, 56, 35, 0.75);
 }
 
 .network-container.light .side-panel-report-btn:hover {
   background: rgba(160, 140, 100, 0.12);
   border-color: rgba(160, 140, 100, 0.22);
-  color: rgba(80, 60, 30, 0.8);
+  color: rgba(40, 30, 15, 0.9);
   box-shadow: none;
 }
 
