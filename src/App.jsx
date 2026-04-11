@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { Joyride } from 'react-joyride'
 import { supabase } from './lib/supabase'
 import LawList from './components/LawList'
@@ -26,7 +26,11 @@ function App() {
 
   // Tour state management
   const [runTour, setRunTour] = useState(() => {
-    return !localStorage.getItem('torahLawsTourCompleted')
+    try {
+      return !localStorage.getItem('torahLawsTourCompleted')
+    } catch {
+      return false // If localStorage unavailable, don't auto-start
+    }
   })
 
   // Load laws and category metadata from Supabase
@@ -44,20 +48,28 @@ function App() {
       .catch(err => console.error('Error loading data:', err))
   }, [])
 
-  const handleJoyrideCallback = (data) => {
+  const handleJoyrideCallback = useCallback((data) => {
     const { status } = data
 
     // Tour finished or skipped
     if (status === 'finished' || status === 'skipped') {
-      localStorage.setItem('torahLawsTourCompleted', 'true')
+      try {
+        localStorage.setItem('torahLawsTourCompleted', 'true')
+      } catch {
+        // Ignore localStorage errors
+      }
       setRunTour(false)
     }
-  }
+  }, [])
 
-  const handleRestartTour = () => {
-    localStorage.removeItem('torahLawsTourCompleted')
+  const handleRestartTour = useCallback(() => {
+    try {
+      localStorage.removeItem('torahLawsTourCompleted')
+    } catch {
+      // Ignore localStorage errors
+    }
     setRunTour(true)
-  }
+  }, [])
 
   return (
     <>

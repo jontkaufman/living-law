@@ -101,9 +101,6 @@ function NetworkGraphStyled({ laws, categoryMeta = {}, onSelectLaw, selectedLaw,
   const [showSearch, setShowSearch] = useState(false)
   const searchInputRef = useRef(null)
 
-  // Observance legend state
-  const [showObservanceLegend, setShowObservanceLegend] = useState(true)
-
   // Canvas refs
   const nodesRef = useRef([])
   const edgesRef = useRef([])
@@ -1293,14 +1290,9 @@ function NetworkGraphStyled({ laws, categoryMeta = {}, onSelectLaw, selectedLaw,
       </div>
 
       {/* Observance Legend */}
-      <div className="observance-legend-container">
-        <button
-          className={`legend-toggle-btn ${showObservanceLegend ? 'active' : ''}`}
-          onClick={() => setShowObservanceLegend(v => !v)}
-        >
-          <Sparkles className="w-3.5 h-3.5" /> Observance
-        </button>
-        {showObservanceLegend && (
+      {/* Observance Legend - persistent when side panel closed */}
+      {!selectedLaw && (
+        <div className="observance-legend-container">
           <div className="observance-legend">
             {Object.entries(OBSERVANCE_CONFIG).map(([key, cfg]) => (
               <div key={key} className="observance-legend-item">
@@ -1309,8 +1301,8 @@ function NetworkGraphStyled({ laws, categoryMeta = {}, onSelectLaw, selectedLaw,
               </div>
             ))}
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
 
       <LawSidePanel selectedLaw={selectedLaw} onCloseLaw={onCloseLaw} />

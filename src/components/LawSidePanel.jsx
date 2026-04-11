@@ -363,6 +363,18 @@ function LawSidePanel({ selectedLaw, onCloseLaw }) {
                 </>
               )}
             </div>
+
+            {/* Observance Legend - sticky to bottom */}
+            <div className="side-panel-observance-legend">
+              <div className="observance-legend-items">
+                {Object.entries(OBSERVANCE_CONFIG).map(([key, cfg]) => (
+                  <div key={key} className="observance-legend-item-inline">
+                    <span className="observance-legend-symbol" style={{ color: cfg.color }}>{cfg.symbol}</span>
+                    <span className="observance-legend-label-small">{cfg.label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
           </>
         )}
       </div>

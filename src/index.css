@@ -39,12 +39,17 @@
   height: 100%;
   border-right: 1px solid rgba(210, 180, 120, 0.12);
   overflow: hidden;
+  position: relative;
+  z-index: 10;
+  background: #0a0908;
 }
 
 .split-right {
   width: 60%;
   height: 100%;
   overflow: hidden;
+  position: relative;
+  z-index: 1;
 }
 
 @media (max-width: 900px) {
@@ -60,6 +65,7 @@
 
 .split-fullscreen.light .split-left {
   border-right-color: rgba(160, 140, 100, 0.15);
+  background: #f8f5f0;
 }
 
 @layer components {

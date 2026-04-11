@@ -40,9 +40,6 @@ function LawList({ laws, categoryMeta = {}, onSelectLaw, selectedLaw, onCloseLaw
   const [showSearch, setShowSearch] = useState(false)
   const searchInputRef = useRef(null)
 
-  // Observance Legend
-  const [showObservanceLegend, setShowObservanceLegend] = useState(false)
-
   // Feedback
   const [showFeedback, setShowFeedback] = useState(false)
   const [feedbackName, setFeedbackName] = useState('')
@@ -520,15 +517,9 @@ function LawList({ laws, categoryMeta = {}, onSelectLaw, selectedLaw, onCloseLaw
         </div>
       )}
 
-      {/* Observance Legend */}
-      <div className="observance-legend-container">
-        <button
-          className={`legend-toggle-btn ${showObservanceLegend ? 'active' : ''}`}
-          onClick={() => setShowObservanceLegend(v => !v)}
-        >
-          <Sparkles className="w-3.5 h-3.5" /> Observance
-        </button>
-        {showObservanceLegend && (
+      {/* Observance Legend - persistent when side panel closed, hidden in split view */}
+      {!selectedLaw && !hideSidePanel && (
+        <div className="observance-legend-container">
           <div className="observance-legend">
             {Object.entries(OBSERVANCE_CONFIG).map(([key, cfg]) => (
               <div key={key} className="observance-legend-item">
@@ -537,8 +528,8 @@ function LawList({ laws, categoryMeta = {}, onSelectLaw, selectedLaw, onCloseLaw
               </div>
             ))}
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Side panel — hidden in split view (network panel handles it) */}
       {!hideSidePanel && <LawSidePanel selectedLaw={selectedLaw} onCloseLaw={onCloseLaw} />}

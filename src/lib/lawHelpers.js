@@ -91,7 +91,7 @@ export function extractKeywords(text, maxCount = 12) {
 
 export function getShortTitle(law, maxLen = 50) {
   let title = law.law_summary || law.reference
-  title = title.replace(/^(The law that|Law that|Command to|Requirement to|Prohibition against|You shall|You must|Do not)\s+/i, '')
+  title = title.replace(/^(The law that|Law that|Command to|Requirement to|Prohibition against|You shall|You must)\s+/i, '')
   title = title.charAt(0).toUpperCase() + title.slice(1)
   if (title.length > maxLen) title = title.substring(0, maxLen) + '...'
   return title
