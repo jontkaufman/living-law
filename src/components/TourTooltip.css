@@ -1,0 +1,62 @@
+/* src/components/TourTooltip.css */
+.tour-tooltip {
+  max-width: 380px;
+  padding: 0;
+}
+
+.tour-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 12px 0;
+  color: inherit;
+}
+
+.tour-content {
+  font-size: 15px;
+  line-height: 1.6;
+  margin-bottom: 20px;
+  white-space: pre-line;
+  color: inherit;
+}
+
+.tour-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(160, 160, 160, 0.2);
+}
+
+.tour-buttons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.tour-btn {
+  font-family: inherit;
+  transition: opacity 0.2s;
+}
+
+.tour-btn:hover {
+  opacity: 0.8;
+}
+
+.tour-btn-primary {
+  /* Styles from tourStyles.js buttonNext */
+}
+
+.tour-btn-back {
+  /* Styles from tourStyles.js buttonBack */
+}
+
+.tour-btn-skip {
+  /* Styles from tourStyles.js buttonSkip */
+}
+
+.tour-progress {
+  font-size: 13px;
+  color: #a0a0a0;
+  font-weight: 500;
+}
