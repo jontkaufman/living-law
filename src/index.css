@@ -23,6 +23,45 @@
   background: #0a0908;
 }
 
+/* Split view: list left + network right */
+.split-fullscreen {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: #0a0908;
+  display: flex;
+}
+
+.split-left {
+  width: 40%;
+  height: 100%;
+  border-right: 1px solid rgba(210, 180, 120, 0.12);
+  overflow: hidden;
+}
+
+.split-right {
+  width: 60%;
+  height: 100%;
+  overflow: hidden;
+}
+
+@media (max-width: 900px) {
+  .split-left { width: 50%; }
+  .split-right { width: 50%; }
+}
+
+/* ── Light mode for wrapper elements ── */
+.network-fullscreen.light,
+.split-fullscreen.light {
+  background: #f8f5f0;
+}
+
+.split-fullscreen.light .split-left {
+  border-right-color: rgba(160, 140, 100, 0.15);
+}
+
 @layer components {
   /* Badge styles for law classifications */
   .badge {

@@ -1,0 +1,450 @@
+/* ── Stats Overview — "Scrolls by Lamplight" dark theme ────────────────────── */
+/* Uses CSS custom properties defined in NetworkGraphStyled.css */
+
+.stats-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: var(--bg-deep);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Same star-field background as network/accordion views */
+.stats-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(140, 90, 40, 0.06) 0%, transparent 60%),
+    radial-gradient(ellipse at 75% 30%, rgba(160, 110, 50, 0.05) 0%, transparent 55%),
+    radial-gradient(ellipse at 50% 80%, rgba(120, 70, 30, 0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 85% 75%, rgba(100, 80, 40, 0.04) 0%, transparent 45%);
+  animation: nebulaShift 30s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.stats-container::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 10% 15%, rgba(235, 220, 190, 0.4), transparent),
+    radial-gradient(1px 1px at 25% 45%, rgba(235, 220, 190, 0.25), transparent),
+    radial-gradient(1px 1px at 40% 10%, rgba(235, 220, 190, 0.35), transparent),
+    radial-gradient(1px 1px at 55% 65%, rgba(235, 220, 190, 0.2), transparent),
+    radial-gradient(1px 1px at 70% 25%, rgba(235, 220, 190, 0.3), transparent),
+    radial-gradient(1px 1px at 85% 55%, rgba(235, 220, 190, 0.25), transparent),
+    radial-gradient(1px 1px at 15% 75%, rgba(235, 220, 190, 0.15), transparent),
+    radial-gradient(1px 1px at 35% 85%, rgba(235, 220, 190, 0.3), transparent),
+    radial-gradient(1px 1px at 60% 40%, rgba(235, 220, 190, 0.12), transparent),
+    radial-gradient(1px 1px at 90% 80%, rgba(235, 220, 190, 0.25), transparent);
+  animation: twinkle 10s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Header ── */
+.stats-header {
+  position: relative;
+  padding: 14px 20px;
+  background: linear-gradient(180deg, rgba(10, 9, 8, 0.95) 0%, rgba(10, 9, 8, 0.7) 100%);
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.stats-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.stats-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: rgba(var(--gold-bright), 0.9);
+  margin: 0;
+}
+
+.stats-subtitle {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(var(--text-secondary), 0.7);
+}
+
+.stats-header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── Scrollable body ── */
+.stats-body {
+  position: relative;
+  flex: 1;
+  overflow-y: auto;
+  z-index: 1;
+  padding: 24px 28px 80px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--gold), 0.12) transparent;
+}
+
+.stats-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.stats-body::-webkit-scrollbar-thumb {
+  background: rgba(var(--gold), 0.15);
+  border-radius: 3px;
+}
+
+/* ── Key metrics row ── */
+.stats-metrics {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.stats-metric {
+  flex: 1;
+  min-width: 140px;
+  padding: 18px 16px;
+  background: rgba(var(--gold), 0.04);
+  border: 1px solid rgba(var(--gold), 0.1);
+  border-radius: 10px;
+  text-align: center;
+}
+
+.stats-metric-value {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 36px;
+  font-weight: 600;
+  line-height: 1;
+  color: rgba(var(--text-primary), 0.9);
+  margin-bottom: 6px;
+}
+
+.stats-metric-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(var(--text-secondary), 0.65);
+}
+
+.stats-metric-gold .stats-metric-value {
+  color: rgba(var(--gold-bright), 0.95);
+}
+
+.stats-metric-gold {
+  border-color: rgba(var(--gold), 0.2);
+  background: rgba(var(--gold), 0.06);
+}
+
+.stats-metric-rose .stats-metric-value {
+  color: rgba(var(--rose-bright), 0.9);
+}
+
+.stats-metric-rose {
+  border-color: rgba(var(--rose), 0.18);
+  background: rgba(var(--rose), 0.05);
+}
+
+/* ── Prerequisites row ── */
+.stats-prereq-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.stats-prereq {
+  flex: 1;
+  min-width: 160px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: rgba(var(--amber), 0.04);
+  border: 1px solid rgba(var(--amber), 0.1);
+  border-radius: 8px;
+}
+
+.stats-prereq-val {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 24px;
+  font-weight: 600;
+  color: rgba(var(--amber), 0.85);
+  line-height: 1;
+}
+
+.stats-prereq-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: rgba(var(--text-secondary), 0.6);
+}
+
+/* ── Charts grid ── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 18px;
+}
+
+.stats-card {
+  padding: 20px;
+  background: rgba(var(--gold), 0.03);
+  border: 1px solid rgba(var(--gold), 0.08);
+  border-radius: 10px;
+}
+
+.stats-card-wide {
+  grid-column: 1 / -1;
+}
+
+.stats-card-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(var(--gold), 0.6);
+  margin: 0 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── Bar chart rows ── */
+.stats-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stats-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.stats-bar-label {
+  flex-shrink: 0;
+  width: 160px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  color: rgba(var(--text-secondary), 0.8);
+  text-transform: capitalize;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stats-bar-track {
+  flex: 1;
+  height: 20px;
+  background: rgba(var(--gold), 0.04);
+  border: 1px solid rgba(var(--gold), 0.06);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.stats-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+.stats-bar-value {
+  flex-shrink: 0;
+  width: 90px;
+  text-align: right;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  color: rgba(var(--text-primary), 0.85);
+}
+
+.stats-bar-pct {
+  color: rgba(var(--text-secondary), 0.55);
+  font-size: 10px;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   LIGHT MODE — .stats-container.light
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.stats-container.light {
+  background: #f8f5f0;
+}
+
+.stats-container.light::before,
+.stats-container.light::after {
+  display: none;
+}
+
+/* Header */
+.stats-container.light .stats-header {
+  background: linear-gradient(180deg, rgba(248, 245, 240, 0.98) 0%, rgba(248, 245, 240, 0.85) 100%);
+  border-bottom-color: rgba(160, 140, 100, 0.15);
+}
+
+.stats-container.light .stats-title {
+  color: #6a5020;
+}
+
+.stats-container.light .stats-subtitle {
+  color: rgba(100, 80, 50, 0.65);
+}
+
+/* Nav buttons */
+.stats-container.light .nav-btn {
+  background: rgba(160, 140, 100, 0.08);
+  border-color: rgba(160, 140, 100, 0.15);
+  color: rgba(100, 80, 50, 0.6);
+}
+
+.stats-container.light .nav-btn:hover {
+  background: rgba(160, 140, 100, 0.15);
+  border-color: rgba(160, 140, 100, 0.25);
+  color: rgba(80, 60, 30, 0.85);
+  box-shadow: none;
+}
+
+/* Scrollbar */
+.stats-container.light .stats-body {
+  scrollbar-color: rgba(160, 140, 100, 0.15) transparent;
+}
+
+.stats-container.light .stats-body::-webkit-scrollbar-thumb {
+  background: rgba(160, 140, 100, 0.2);
+}
+
+/* Metric cards */
+.stats-container.light .stats-metric {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: rgba(160, 140, 100, 0.12);
+}
+
+.stats-container.light .stats-metric-value {
+  color: #3d3520;
+}
+
+.stats-container.light .stats-metric-label {
+  color: rgba(100, 80, 50, 0.6);
+}
+
+.stats-container.light .stats-metric-gold {
+  background: rgba(210, 180, 120, 0.1);
+  border-color: rgba(210, 180, 120, 0.2);
+}
+
+.stats-container.light .stats-metric-gold .stats-metric-value {
+  color: #8a6d30;
+}
+
+.stats-container.light .stats-metric-rose {
+  background: rgba(210, 160, 140, 0.08);
+  border-color: rgba(210, 160, 140, 0.18);
+}
+
+.stats-container.light .stats-metric-rose .stats-metric-value {
+  color: #a06040;
+}
+
+/* Prerequisites */
+.stats-container.light .stats-prereq {
+  background: rgba(255, 255, 255, 0.6);
+  border-color: rgba(160, 140, 100, 0.12);
+}
+
+.stats-container.light .stats-prereq-val {
+  color: #9a7a30;
+}
+
+.stats-container.light .stats-prereq-label {
+  color: rgba(100, 80, 50, 0.6);
+}
+
+/* Cards */
+.stats-container.light .stats-card {
+  background: rgba(255, 255, 255, 0.6);
+  border-color: rgba(160, 140, 100, 0.1);
+}
+
+.stats-container.light .stats-card-title {
+  color: #8a6d30;
+}
+
+/* Bar chart */
+.stats-container.light .stats-bar-label {
+  color: rgba(60, 50, 30, 0.8);
+}
+
+.stats-container.light .stats-bar-track {
+  background: rgba(160, 140, 100, 0.06);
+  border-color: rgba(160, 140, 100, 0.08);
+}
+
+.stats-container.light .stats-bar-value {
+  color: #3d3520;
+}
+
+.stats-container.light .stats-bar-pct {
+  color: rgba(100, 80, 50, 0.55);
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .stats-header {
+    padding: 10px 14px;
+  }
+
+  .stats-title {
+    font-size: 20px;
+  }
+
+  .stats-body {
+    padding: 16px 14px 60px;
+  }
+
+  .stats-metrics {
+    gap: 10px;
+  }
+
+  .stats-metric {
+    min-width: 110px;
+    padding: 12px 10px;
+  }
+
+  .stats-metric-value {
+    font-size: 28px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-bar-label {
+    width: 100px;
+    font-size: 10px;
+  }
+
+  .stats-bar-value {
+    width: 70px;
+    font-size: 10px;
+  }
+}

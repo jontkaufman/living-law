@@ -1,0 +1,15 @@
+{
+  "name": "torah-embed-generator",
+  "version": "1.0.0",
+  "description": "Interactive generator for customizable Torah Laws embeds",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler pages dev .",
+    "dev:local": "node setup.cjs",
+    "deploy": "wrangler pages deploy . --project-name=torah-embed-generator",
+    "tail": "wrangler pages deployment tail --project-name=torah-embed-generator"
+  },
+  "keywords": ["torah", "laws", "embed", "cloudflare"],
+  "author": "",
+  "license": "ISC"
+}

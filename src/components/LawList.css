@@ -1,0 +1,903 @@
+/* ── Accordion View — "Scrolls by Lamplight" dark theme ────────────────────── */
+/* Uses CSS custom properties defined in NetworkGraphStyled.css */
+
+.accordion-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: var(--bg-deep);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: background 0.3s ease;
+}
+
+/* Same star-field background as network view */
+.accordion-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(140, 90, 40, 0.06) 0%, transparent 60%),
+    radial-gradient(ellipse at 75% 30%, rgba(160, 110, 50, 0.05) 0%, transparent 55%),
+    radial-gradient(ellipse at 50% 80%, rgba(120, 70, 30, 0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 85% 75%, rgba(100, 80, 40, 0.04) 0%, transparent 45%);
+  animation: nebulaShift 30s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.accordion-container::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 10% 15%, rgba(235, 220, 190, 0.4), transparent),
+    radial-gradient(1px 1px at 25% 45%, rgba(235, 220, 190, 0.25), transparent),
+    radial-gradient(1px 1px at 40% 10%, rgba(235, 220, 190, 0.35), transparent),
+    radial-gradient(1px 1px at 55% 65%, rgba(235, 220, 190, 0.2), transparent),
+    radial-gradient(1px 1px at 70% 25%, rgba(235, 220, 190, 0.3), transparent),
+    radial-gradient(1px 1px at 85% 55%, rgba(235, 220, 190, 0.25), transparent),
+    radial-gradient(1px 1px at 15% 75%, rgba(235, 220, 190, 0.15), transparent),
+    radial-gradient(1px 1px at 35% 85%, rgba(235, 220, 190, 0.3), transparent),
+    radial-gradient(1px 1px at 60% 40%, rgba(235, 220, 190, 0.12), transparent),
+    radial-gradient(1px 1px at 90% 80%, rgba(235, 220, 190, 0.25), transparent);
+  animation: twinkle 10s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Header ── */
+.accordion-header {
+  position: relative;
+  padding: 14px 20px;
+  background: linear-gradient(180deg, rgba(10, 9, 8, 0.95) 0%, rgba(10, 9, 8, 0.7) 100%);
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.3s ease;
+}
+
+.accordion-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.accordion-header-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
+.accordion-header-center .header-search {
+  position: relative;
+}
+
+.accordion-header-center .search-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.accordion-header-center .search-input {
+  width: 340px;
+}
+
+.accordion-header-center .search-dropdown {
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
+}
+
+.accordion-header-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex: 1;
+}
+
+/* ── Scrollable body ── */
+.accordion-body {
+  position: relative;
+  flex: 1;
+  overflow-y: auto;
+  z-index: 1;
+  padding: 16px 20px 80px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--gold), 0.12) transparent;
+  transition: margin-right 0.3s ease;
+}
+
+.accordion-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.accordion-body::-webkit-scrollbar-thumb {
+  background: rgba(var(--gold), 0.15);
+  border-radius: 3px;
+}
+
+.accordion-body.panel-open {
+  margin-right: 440px;
+  transition: margin-right 0.3s ease;
+}
+
+/* ── Generic accordion row ── */
+.accordion-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+  gap: 12px;
+}
+
+.accordion-chevron {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  color: rgba(var(--cat-r, 210), var(--cat-g, 180), var(--cat-b, 120), 0.7);
+  transition: color 0.2s ease;
+}
+
+.accordion-row:hover .accordion-chevron {
+  color: rgba(var(--cat-r, 210), var(--cat-g, 180), var(--cat-b, 120), 0.95);
+}
+
+.accordion-row-label {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.accordion-row-count {
+  flex-shrink: 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: rgba(var(--text-secondary), 0.75);
+}
+
+/* Hide count when row is expanded — subcategories show their own counts */
+.accordion-row.open .accordion-row-count {
+  display: none;
+}
+
+/* ── Root level ── */
+.accordion-root {
+  margin-bottom: 6px;
+}
+
+.accordion-row-root {
+  padding: 20px 18px;
+  border-radius: 8px;
+  background: rgba(var(--cat-r, 210), var(--cat-g, 180), var(--cat-b, 120), 0.03);
+  border: 1px solid rgba(var(--cat-r, 210), var(--cat-g, 180), var(--cat-b, 120), 0.08);
+}
+
+.accordion-row-root:hover {
+  background: rgba(var(--cat-r, 210), var(--cat-g, 180), var(--cat-b, 120), 0.07);
+  border-color: rgba(var(--cat-r, 210), var(--cat-g, 180), var(--cat-b, 120), 0.15);
+}
+
+.accordion-row-root.open {
+  background: rgba(var(--cat-r, 210), var(--cat-g, 180), var(--cat-b, 120), 0.06);
+  border-color: rgba(var(--cat-r, 210), var(--cat-g, 180), var(--cat-b, 120), 0.18);
+}
+
+.accordion-root-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: rgba(var(--cat-r, 210), var(--cat-g, 180), var(--cat-b, 120), 1);
+}
+
+.accordion-root-subtitle {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px;
+  font-style: italic;
+  color: rgba(var(--text-secondary), 0.8);
+  flex-shrink: 0;
+}
+
+.accordion-root-content {
+  padding: 6px 0 6px 8px;
+}
+
+/* ── Level 2 ── */
+.accordion-l2 {
+  margin: 2px 0;
+}
+
+.accordion-row-l2 {
+  padding: 15px 16px 15px 24px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+}
+
+.accordion-row-l2:hover {
+  background: rgba(var(--cat-r, 210), var(--cat-g, 180), var(--cat-b, 120), 0.06);
+  border-color: rgba(var(--cat-r, 210), var(--cat-g, 180), var(--cat-b, 120), 0.1);
+}
+
+.accordion-row-l2.open {
+  background: rgba(var(--cat-r, 210), var(--cat-g, 180), var(--cat-b, 120), 0.05);
+  border-color: rgba(var(--cat-r, 210), var(--cat-g, 180), var(--cat-b, 120), 0.12);
+}
+
+.accordion-row-l2 .accordion-row-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 15px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(var(--cat-r, 210), var(--cat-g, 180), var(--cat-b, 120), 0.95);
+  font-weight: 500;
+}
+
+.accordion-l2-num {
+  color: rgba(var(--cat-r, 210), var(--cat-g, 180), var(--cat-b, 120), 0.7);
+  font-weight: 400;
+}
+
+.accordion-l2-content {
+  padding: 2px 0 2px 16px;
+}
+
+/* ── Level 3 ── */
+.accordion-l3 {
+  margin: 1px 0;
+}
+
+.accordion-row-l3 {
+  padding: 12px 16px 12px 32px;
+  border-radius: 5px;
+  border: 1px solid transparent;
+}
+
+.accordion-row-l3:hover {
+  background: rgba(var(--cat-r, 210), var(--cat-g, 180), var(--cat-b, 120), 0.05);
+}
+
+.accordion-row-l3.open {
+  background: rgba(var(--cat-r, 210), var(--cat-g, 180), var(--cat-b, 120), 0.04);
+}
+
+.accordion-row-l3 .accordion-row-label {
+  font-size: 16px;
+  color: rgba(var(--text-secondary), 0.9);
+}
+
+.accordion-l3-content {
+  padding: 2px 0 2px 12px;
+}
+
+/* ── Level 4 ── */
+.accordion-l4 {
+  margin: 1px 0;
+}
+
+.accordion-row-l4 {
+  padding: 10px 16px 10px 40px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+}
+
+.accordion-row-l4:hover {
+  background: rgba(var(--cat-r, 210), var(--cat-g, 180), var(--cat-b, 120), 0.04);
+}
+
+.accordion-row-l4.open {
+  background: rgba(var(--cat-r, 210), var(--cat-g, 180), var(--cat-b, 120), 0.03);
+}
+
+.accordion-row-l4 .accordion-row-label {
+  font-size: 15px;
+  color: rgba(var(--text-secondary), 0.85);
+}
+
+/* ── Law rows ── */
+.accordion-laws {
+  padding: 4px 0 8px 24px;
+}
+
+.accordion-law {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 11px 14px;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+  border-left: 2px solid rgba(var(--gold), 0.12);
+}
+
+.accordion-law:hover {
+  background: rgba(var(--gold), 0.08);
+  border-left-color: rgba(var(--gold), 0.4);
+}
+
+.accordion-law.selected {
+  background: rgba(var(--gold), 0.12);
+  border-left-color: rgba(var(--gold), 0.6);
+}
+
+.accordion-law-ref {
+  flex-shrink: 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  min-width: 120px;
+}
+
+.accordion-law-summary {
+  flex: 1;
+  font-size: 15px;
+  color: rgba(var(--text-primary), 0.85);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.accordion-law-obs {
+  flex-shrink: 0;
+  font-size: 16px;
+  opacity: 0.9;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   LIGHT MODE
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.accordion-container.light {
+  background: #f8f5f0;
+}
+
+.accordion-container.light::before,
+.accordion-container.light::after {
+  display: none;
+}
+
+.accordion-container.light .accordion-header {
+  background: linear-gradient(180deg, rgba(248, 245, 240, 0.98) 0%, rgba(248, 245, 240, 0.85) 100%);
+  border-bottom-color: rgba(160, 140, 100, 0.15);
+}
+
+/* Breadcrumbs */
+.accordion-container.light .breadcrumb .sep {
+  color: rgba(120, 100, 70, 0.3);
+}
+
+.accordion-container.light .breadcrumb-btn {
+  color: rgba(60, 48, 25, 0.65);
+}
+
+.accordion-container.light .breadcrumb-btn:hover:not(:disabled) {
+  color: rgba(40, 30, 12, 0.92);
+}
+
+.accordion-container.light .breadcrumb-btn.active {
+  color: rgba(40, 30, 12, 0.92);
+}
+
+/* Nav buttons */
+.accordion-container.light .nav-btn {
+  background: rgba(160, 140, 100, 0.08);
+  border-color: rgba(160, 140, 100, 0.15);
+  color: rgba(100, 80, 50, 0.6);
+}
+
+.accordion-container.light .nav-btn:hover {
+  background: rgba(160, 140, 100, 0.15);
+  border-color: rgba(160, 140, 100, 0.25);
+  color: rgba(80, 60, 30, 0.85);
+}
+
+/* Search */
+.accordion-container.light .search-input {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(160, 140, 100, 0.2);
+  color: #3d3520;
+}
+
+.accordion-container.light .search-input::placeholder {
+  color: rgba(100, 80, 50, 0.35);
+}
+
+.accordion-container.light .search-input:focus {
+  border-color: rgba(160, 140, 100, 0.4);
+  background: #fff;
+  box-shadow: 0 0 12px rgba(160, 140, 100, 0.1);
+}
+
+.accordion-container.light .search-icon {
+  color: rgba(100, 80, 50, 0.35);
+}
+
+.accordion-container.light .search-close {
+  color: rgba(100, 80, 50, 0.4);
+}
+
+.accordion-container.light .search-dropdown {
+  background: #fff;
+  border-color: rgba(160, 140, 100, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.accordion-container.light .search-result:hover {
+  background: rgba(160, 140, 100, 0.08);
+}
+
+.accordion-container.light .search-result-ref {
+  color: #8a6d30;
+}
+
+.accordion-container.light .search-result-title {
+  color: rgba(60, 50, 30, 0.6);
+}
+
+.accordion-container.light .search-no-results {
+  color: rgba(100, 80, 50, 0.4);
+}
+
+/* Scrollbar */
+.accordion-container.light .accordion-body {
+  scrollbar-color: rgba(160, 140, 100, 0.15) transparent;
+}
+
+.accordion-container.light .accordion-body::-webkit-scrollbar-thumb {
+  background: rgba(160, 140, 100, 0.2);
+}
+
+/* Row count */
+.accordion-container.light .accordion-row-count {
+  color: rgba(70, 55, 30, 0.75);
+}
+
+/* Root rows */
+.accordion-container.light .accordion-row-root {
+  background: rgba(var(--cat-r, 210), var(--cat-g, 180), var(--cat-b, 120), 0.06);
+  border-color: rgba(var(--cat-r, 210), var(--cat-g, 180), var(--cat-b, 120), 0.12);
+}
+
+.accordion-container.light .accordion-row-root:hover {
+  background: rgba(var(--cat-r, 210), var(--cat-g, 180), var(--cat-b, 120), 0.12);
+  border-color: rgba(var(--cat-r, 210), var(--cat-g, 180), var(--cat-b, 120), 0.2);
+}
+
+.accordion-container.light .accordion-row-root.open {
+  background: rgba(var(--cat-r, 210), var(--cat-g, 180), var(--cat-b, 120), 0.1);
+  border-color: rgba(var(--cat-r, 210), var(--cat-g, 180), var(--cat-b, 120), 0.22);
+}
+
+.accordion-container.light .accordion-root-label {
+  color: rgba(calc(var(--cat-r, 210) * 0.5), calc(var(--cat-g, 180) * 0.5), calc(var(--cat-b, 120) * 0.4), 0.95);
+}
+
+.accordion-container.light .accordion-root-subtitle {
+  color: rgba(60, 48, 25, 0.8);
+}
+
+/* L2 rows */
+.accordion-container.light .accordion-row-l2:hover {
+  background: rgba(var(--cat-r, 210), var(--cat-g, 180), var(--cat-b, 120), 0.1);
+  border-color: rgba(var(--cat-r, 210), var(--cat-g, 180), var(--cat-b, 120), 0.15);
+}
+
+.accordion-container.light .accordion-row-l2.open {
+  background: rgba(var(--cat-r, 210), var(--cat-g, 180), var(--cat-b, 120), 0.08);
+  border-color: rgba(var(--cat-r, 210), var(--cat-g, 180), var(--cat-b, 120), 0.18);
+}
+
+.accordion-container.light .accordion-row-l2 .accordion-row-label {
+  color: rgba(calc(var(--cat-r, 210) * 0.45), calc(var(--cat-g, 180) * 0.45), calc(var(--cat-b, 120) * 0.35), 0.9);
+}
+
+.accordion-container.light .accordion-l2-num {
+  color: rgba(calc(var(--cat-r, 210) * 0.45), calc(var(--cat-g, 180) * 0.45), calc(var(--cat-b, 120) * 0.35), 0.5);
+}
+
+/* L3 rows */
+.accordion-container.light .accordion-row-l3:hover {
+  background: rgba(var(--cat-r, 210), var(--cat-g, 180), var(--cat-b, 120), 0.08);
+}
+
+.accordion-container.light .accordion-row-l3 .accordion-row-label {
+  color: rgba(30, 25, 10, 0.92);
+}
+
+/* L4 rows */
+.accordion-container.light .accordion-row-l4:hover {
+  background: rgba(var(--cat-r, 210), var(--cat-g, 180), var(--cat-b, 120), 0.06);
+}
+
+.accordion-container.light .accordion-row-l4 .accordion-row-label {
+  color: rgba(35, 28, 14, 0.9);
+}
+
+/* Chevrons */
+.accordion-container.light .accordion-chevron {
+  color: rgba(var(--cat-r, 210), var(--cat-g, 180), var(--cat-b, 120), 0.35);
+}
+
+.accordion-container.light .accordion-row:hover .accordion-chevron {
+  color: rgba(var(--cat-r, 210), var(--cat-g, 180), var(--cat-b, 120), 0.7);
+}
+
+/* Law rows */
+.accordion-container.light .accordion-law {
+  border-left-color: rgba(160, 140, 100, 0.1);
+}
+
+.accordion-container.light .accordion-law:hover {
+  background: rgba(160, 140, 100, 0.08);
+  border-left-color: rgba(160, 140, 100, 0.3);
+}
+
+.accordion-container.light .accordion-law.selected {
+  background: rgba(160, 140, 100, 0.14);
+  border-left-color: rgba(160, 140, 100, 0.55);
+}
+
+.accordion-container.light .accordion-law-summary {
+  color: rgba(30, 25, 10, 0.92);
+}
+
+/* View switch buttons */
+.accordion-container.light .legend-view-btn {
+  background: rgba(160, 140, 100, 0.06);
+  border-color: rgba(160, 140, 100, 0.12);
+  color: rgba(100, 80, 50, 0.5);
+}
+
+.accordion-container.light .legend-view-btn:hover {
+  background: rgba(160, 140, 100, 0.12);
+  border-color: rgba(160, 140, 100, 0.22);
+  color: rgba(80, 60, 30, 0.8);
+}
+
+/* Feedback button */
+.accordion-container.light .feedback-btn {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: rgba(160, 140, 100, 0.15);
+  color: rgba(100, 80, 50, 0.55);
+}
+
+.accordion-container.light .feedback-btn:hover {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(160, 140, 100, 0.3);
+  color: rgba(80, 60, 30, 0.8);
+}
+
+/* Side panel in light mode */
+.accordion-container.light .side-panel {
+  background: rgba(255, 255, 255, 0.96);
+  border-left-color: rgba(160, 140, 100, 0.15);
+}
+
+.accordion-container.light .side-panel-header {
+  border-bottom-color: rgba(160, 140, 100, 0.12);
+}
+
+.accordion-container.light .side-panel-title {
+  color: #2a2210;
+}
+
+.accordion-container.light .side-panel-close {
+  background: rgba(160, 140, 100, 0.06);
+  border-color: rgba(160, 140, 100, 0.12);
+  color: rgba(100, 80, 50, 0.5);
+}
+
+.accordion-container.light .side-panel-close:hover {
+  background: rgba(160, 140, 100, 0.12);
+  color: rgba(80, 60, 30, 0.8);
+}
+
+.accordion-container.light .side-panel-tabs {
+  border-bottom-color: rgba(160, 140, 100, 0.1);
+}
+
+.accordion-container.light .side-panel-tab {
+  color: rgba(70, 55, 30, 0.55);
+}
+
+.accordion-container.light .side-panel-tab:hover {
+  color: rgba(50, 38, 15, 0.85);
+  background: rgba(160, 140, 100, 0.05);
+}
+
+.accordion-container.light .side-panel-tab.active {
+  color: #8a6d30;
+  border-bottom-color: rgba(160, 140, 100, 0.5);
+}
+
+.accordion-container.light .side-panel-body {
+  scrollbar-color: rgba(160, 140, 100, 0.12) transparent;
+}
+
+.accordion-container.light .side-panel-label {
+  color: #8a6d30;
+}
+
+.accordion-container.light .side-panel-verse {
+  color: #2a2210;
+  border-left-color: rgba(160, 140, 100, 0.3);
+}
+
+.accordion-container.light .side-panel-text {
+  color: rgba(35, 28, 14, 0.88);
+}
+
+.accordion-container.light .side-panel-field {
+  border-bottom-color: rgba(160, 140, 100, 0.08);
+}
+
+.accordion-container.light .side-panel-field-label {
+  color: rgba(70, 55, 30, 0.65);
+}
+
+.accordion-container.light .side-panel-field-value {
+  color: rgba(35, 28, 14, 0.88);
+}
+
+.accordion-container.light .side-panel-eternal {
+  background: rgba(210, 160, 140, 0.08);
+  border-color: rgba(210, 160, 140, 0.15);
+}
+
+.accordion-container.light .side-panel-phrase {
+  color: #a06040;
+}
+
+.accordion-container.light .side-panel-prereq {
+  color: #9a7a30;
+}
+
+.accordion-container.light .verse-ref-btn {
+  background: rgba(160, 140, 100, 0.06);
+  border-color: rgba(160, 140, 100, 0.12);
+  color: #8a6d30;
+}
+
+.accordion-container.light .verse-ref-btn:hover {
+  background: rgba(160, 140, 100, 0.12);
+  border-color: rgba(160, 140, 100, 0.22);
+  color: #6a5020;
+}
+
+.accordion-container.light .keyword-tag {
+  background: rgba(210, 160, 140, 0.08);
+  border-color: rgba(210, 160, 140, 0.15);
+  color: #a06040;
+}
+
+.accordion-container.light .keyword-tag:hover {
+  background: rgba(210, 160, 140, 0.15);
+  border-color: rgba(210, 160, 140, 0.28);
+  color: #804830;
+}
+
+.accordion-container.light .side-panel-report-btn {
+  background: rgba(160, 140, 100, 0.06);
+  border-color: rgba(160, 140, 100, 0.12);
+  color: rgba(100, 80, 50, 0.55);
+}
+
+.accordion-container.light .side-panel-report-btn:hover {
+  background: rgba(160, 140, 100, 0.12);
+  border-color: rgba(160, 140, 100, 0.22);
+  color: rgba(80, 60, 30, 0.8);
+}
+
+/* Feedback overlay in light */
+.accordion-container.light .feedback-overlay {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.accordion-container.light .feedback-dialog {
+  background: #fff;
+  border-color: rgba(160, 140, 100, 0.2);
+  box-shadow: 0 16px 64px rgba(0, 0, 0, 0.12);
+}
+
+.accordion-container.light .feedback-dialog-header {
+  border-bottom-color: rgba(160, 140, 100, 0.1);
+}
+
+.accordion-container.light .feedback-dialog-title {
+  color: #3d3520;
+}
+
+.accordion-container.light .feedback-label {
+  color: #8a6d30;
+}
+
+.accordion-container.light .feedback-field {
+  background: rgba(160, 140, 100, 0.04);
+  border-color: rgba(160, 140, 100, 0.15);
+  color: #3d3520;
+}
+
+.accordion-container.light .feedback-field:focus {
+  border-color: rgba(160, 140, 100, 0.35);
+  background: #fff;
+}
+
+.accordion-container.light .feedback-submit-btn {
+  background: rgba(160, 140, 100, 0.1);
+  border-color: rgba(160, 140, 100, 0.22);
+  color: #3d3520;
+}
+
+.accordion-container.light .feedback-submit-btn:hover:not(:disabled) {
+  background: rgba(160, 140, 100, 0.18);
+  border-color: rgba(160, 140, 100, 0.35);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   SPLIT VIEW — compact sizing (~20% smaller)
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.split-left .accordion-header {
+  padding: 10px 14px;
+}
+
+.split-left .accordion-header-center .search-input {
+  width: 200px;
+}
+
+.split-left .accordion-body {
+  padding: 12px 14px 60px;
+}
+
+/* Root */
+.split-left .accordion-row-root {
+  padding: 14px 14px;
+}
+
+.split-left .accordion-root-label {
+  font-size: 22px;
+}
+
+.split-left .accordion-root-subtitle {
+  font-size: 14px;
+}
+
+.split-left .accordion-root-content {
+  padding: 4px 0 4px 4px;
+}
+
+/* Level 2 */
+.split-left .accordion-row-l2 {
+  padding: 11px 12px 11px 18px;
+}
+
+.split-left .accordion-row-l2 .accordion-row-label {
+  font-size: 12px;
+  letter-spacing: 1.2px;
+}
+
+.split-left .accordion-l2-content {
+  padding: 2px 0 2px 10px;
+}
+
+/* Level 3 */
+.split-left .accordion-row-l3 {
+  padding: 9px 12px 9px 24px;
+}
+
+.split-left .accordion-row-l3 .accordion-row-label {
+  font-size: 13px;
+}
+
+/* Level 4 */
+.split-left .accordion-row-l4 {
+  padding: 7px 12px 7px 30px;
+}
+
+.split-left .accordion-row-l4 .accordion-row-label {
+  font-size: 12px;
+}
+
+/* Row count */
+.split-left .accordion-row-count {
+  font-size: 10px;
+}
+
+/* Law rows */
+.split-left .accordion-laws {
+  padding: 3px 0 6px 16px;
+}
+
+.split-left .accordion-law {
+  padding: 8px 10px;
+  gap: 10px;
+}
+
+.split-left .accordion-law-ref {
+  font-size: 12px;
+  min-width: 95px;
+}
+
+.split-left .accordion-law-summary {
+  font-size: 13px;
+}
+
+.split-left .accordion-law-obs {
+  font-size: 13px;
+}
+
+/* Feedback button */
+.split-left .feedback-btn {
+  padding: 6px 10px;
+  font-size: 8px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .accordion-header {
+    padding: 10px 14px;
+  }
+
+  .accordion-body {
+    padding: 10px 12px 80px;
+  }
+
+  .accordion-body.panel-open {
+    margin-right: 0;
+  }
+
+  .accordion-row-root {
+    padding: 14px 12px;
+  }
+
+  .accordion-root-label {
+    font-size: 22px;
+  }
+
+  .accordion-root-subtitle {
+    display: none;
+  }
+
+  .accordion-row-l2 {
+    padding-left: 16px;
+  }
+
+  .accordion-row-l3 {
+    padding-left: 24px;
+  }
+
+  .accordion-row-l4 {
+    padding-left: 32px;
+  }
+
+  .accordion-law-ref {
+    min-width: 80px;
+    font-size: 12px;
+  }
+
+  .accordion-law-summary {
+    font-size: 13px;
+  }
+}

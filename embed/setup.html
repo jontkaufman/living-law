@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Torah Laws — Embed Generator</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #0e0d0b;
+  color: #e8e4dc;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ── Two-column layout ── */
+.layout {
+  display: flex;
+  height: 100vh;
+}
+
+/* ── Controls panel (left) ── */
+.controls {
+  width: 420px;
+  min-width: 420px;
+  background: #151311;
+  border-right: 1px solid rgba(210, 180, 120, 0.1);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(210, 180, 120, 0.1) transparent;
+}
+
+.controls-header {
+  padding: 20px 22px 16px;
+  border-bottom: 1px solid rgba(210, 180, 120, 0.08);
+}
+
+.controls-header h1 {
+  font-size: 1.15rem;
+  font-weight: 400;
+  color: rgb(210, 180, 120);
+  margin-bottom: 3px;
+}
+
+.controls-header .subtitle {
+  font-size: 0.75rem;
+  color: rgba(200, 185, 160, 0.45);
+}
+
+.controls-body {
+  padding: 16px 22px 20px;
+  flex: 1;
+}
+
+.field {
+  margin-bottom: 1.25rem;
+}
+
+.field-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(210, 180, 120, 0.55);
+  margin-bottom: 6px;
+}
+
+/* ── Theme cards ── */
+.theme-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+}
+
+.theme-option { position: relative; }
+.theme-option input { position: absolute; opacity: 0; pointer-events: none; }
+
+.theme-option label {
+  display: block;
+  padding: 7px 9px;
+  border: 1px solid rgba(210, 180, 120, 0.08);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.theme-option label:hover {
+  border-color: rgba(210, 180, 120, 0.2);
+  background: rgba(210, 180, 120, 0.03);
+}
+
+.theme-option input:checked + label {
+  border-color: rgba(210, 180, 120, 0.45);
+  background: rgba(210, 180, 120, 0.07);
+}
+
+.theme-name {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #e0dcd4;
+}
+
+.theme-desc {
+  font-size: 0.62rem;
+  color: rgba(200, 185, 160, 0.4);
+  margin-top: 1px;
+}
+
+/* ── Typography table ── */
+.typo-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.72rem;
+}
+
+.typo-table th {
+  text-align: left;
+  font-size: 0.6rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(210, 180, 120, 0.4);
+  padding: 0 4px 5px;
+  white-space: nowrap;
+}
+
+.typo-table th:last-child {
+  text-align: center;
+  width: 32px;
+}
+
+.typo-table td {
+  padding: 3px 4px;
+  vertical-align: middle;
+}
+
+.typo-table td:first-child {
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: rgba(200, 185, 160, 0.7);
+  white-space: nowrap;
+  width: 72px;
+}
+
+.typo-table select {
+  width: 100%;
+  padding: 4px 20px 4px 5px;
+  background: rgba(240, 235, 225, 0.92);
+  border: 1px solid rgba(210, 180, 120, 0.15);
+  border-radius: 4px;
+  color: #1a1a1a;
+  font-size: 0.68rem;
+  font-family: inherit;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.15s;
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%23555'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 6px center;
+}
+
+.typo-table select:hover,
+.typo-table select:focus {
+  border-color: rgba(210, 180, 120, 0.4);
+}
+
+.typo-italic-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  margin: 0 auto;
+  background: none;
+  border: 1px solid rgba(210, 180, 120, 0.1);
+  border-radius: 4px;
+  color: rgba(200, 185, 160, 0.35);
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.typo-italic-btn:hover {
+  border-color: rgba(210, 180, 120, 0.25);
+  color: rgba(200, 185, 160, 0.6);
+}
+
+.typo-italic-btn.active {
+  border-color: rgba(210, 180, 120, 0.45);
+  background: rgba(210, 180, 120, 0.1);
+  color: #e0dcd4;
+}
+
+/* ── Toggle row ── */
+.toggle-row { display: flex; gap: 4px; }
+
+.toggle-option { position: relative; flex: 1; }
+.toggle-option input { position: absolute; opacity: 0; pointer-events: none; }
+
+.toggle-option label {
+  display: block;
+  text-align: center;
+  padding: 7px 6px;
+  font-size: 0.75rem;
+  border: 1px solid rgba(210, 180, 120, 0.08);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  color: rgba(200, 185, 160, 0.55);
+}
+
+.toggle-option label:hover { border-color: rgba(210, 180, 120, 0.2); }
+
+.toggle-option input:checked + label {
+  border-color: rgba(210, 180, 120, 0.45);
+  background: rgba(210, 180, 120, 0.07);
+  color: #e0dcd4;
+}
+
+.toggle-label-main { font-weight: 500; }
+
+.toggle-label-desc {
+  font-size: 0.62rem;
+  color: rgba(200, 185, 160, 0.35);
+  margin-top: 2px;
+}
+
+.toggle-option input:checked + label .toggle-label-desc {
+  color: rgba(200, 185, 160, 0.5);
+}
+
+/* ── Generate button ── */
+.controls-footer {
+  padding: 12px 22px 18px;
+  border-top: 1px solid rgba(210, 180, 120, 0.08);
+}
+
+.btn-generate {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #0a0908;
+  background: rgb(210, 180, 120);
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.btn-generate:hover { background: rgb(220, 190, 130); }
+.btn-generate:active { transform: scale(0.98); }
+.btn-generate:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+.status {
+  margin-top: 8px;
+  text-align: center;
+  font-size: 0.78rem;
+  min-height: 1.3em;
+}
+
+.status.loading { color: rgba(210, 180, 120, 0.6); }
+.status.success { color: rgb(160, 185, 130); }
+.status.error { color: rgb(200, 100, 80); }
+
+.download-link {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 6px 14px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: rgb(210, 180, 120);
+  border: 1px solid rgba(210, 180, 120, 0.25);
+  border-radius: 5px;
+  text-decoration: none;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.download-link:hover {
+  background: rgba(210, 180, 120, 0.07);
+  border-color: rgba(210, 180, 120, 0.45);
+}
+
+/* ── Preview panel (right) ── */
+.preview {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: #0a0908;
+}
+
+.preview-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background: #151311;
+  border-bottom: 1px solid rgba(210, 180, 120, 0.08);
+  flex-shrink: 0;
+}
+
+.preview-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(210, 180, 120, 0.45);
+}
+
+.preview-loading {
+  font-size: 0.65rem;
+  color: rgba(210, 180, 120, 0.35);
+  transition: opacity 0.2s;
+}
+
+.preview-frame-wrap {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.preview-frame {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: #0a0908;
+}
+
+/* Fade-in transition for iframe */
+.preview-frame.loading { opacity: 0.3; transition: opacity 0.15s; }
+.preview-frame.loaded { opacity: 1; transition: opacity 0.3s; }
+
+/* ── Responsive: stack on narrow screens ── */
+@media (max-width: 960px) {
+  .layout { flex-direction: column; }
+  .controls {
+    width: 100%;
+    min-width: 0;
+    max-height: 50vh;
+    border-right: none;
+    border-bottom: 1px solid rgba(210, 180, 120, 0.1);
+  }
+  .preview { min-height: 50vh; }
+}
+</style>
+</head>
+<body>
+
+<div class="layout">
+  <!-- Left: Controls -->
+  <div class="controls">
+    <div class="controls-header">
+      <h1>Embed Generator</h1>
+      <div class="subtitle">Configure and preview your Torah Laws embed</div>
+    </div>
+
+    <div class="controls-body">
+      <div class="field">
+        <div class="field-label">Theme</div>
+        <div class="theme-grid" id="theme-grid"></div>
+      </div>
+
+      <div class="field">
+        <div class="field-label">Typography</div>
+        <table class="typo-table" id="typo-table">
+          <thead>
+            <tr><th>Role</th><th>Font</th><th>Weight</th><th>Size</th><th>I</th></tr>
+          </thead>
+          <tbody id="typo-body"></tbody>
+        </table>
+      </div>
+
+      <div class="field">
+        <div class="field-label">Initial Mode</div>
+        <div class="toggle-row">
+          <div class="toggle-option">
+            <input type="radio" name="mode" id="mode-dark" value="dark" checked>
+            <label for="mode-dark"><span class="toggle-label-main">Dark</span></label>
+          </div>
+          <div class="toggle-option">
+            <input type="radio" name="mode" id="mode-light" value="light">
+            <label for="mode-light"><span class="toggle-label-main">Light</span></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-label">Data Source</div>
+        <div class="toggle-row">
+          <div class="toggle-option">
+            <input type="radio" name="data" id="data-baked" value="baked" checked>
+            <label for="data-baked">
+              <div class="toggle-label-main">Baked In</div>
+              <div class="toggle-label-desc">Works offline (~2 MB)</div>
+            </label>
+          </div>
+          <div class="toggle-option">
+            <input type="radio" name="data" id="data-live" value="live">
+            <label for="data-live">
+              <div class="toggle-label-main">Live</div>
+              <div class="toggle-label-desc">Fetches at runtime (~60 KB)</div>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls-footer">
+      <button class="btn-generate" id="btn-generate">Generate File</button>
+      <div class="status" id="status"></div>
+    </div>
+  </div>
+
+  <!-- Right: Preview -->
+  <div class="preview">
+    <div class="preview-bar">
+      <span class="preview-label">Live Preview</span>
+      <span class="preview-loading" id="preview-loading"></span>
+    </div>
+    <div class="preview-frame-wrap">
+      <iframe class="preview-frame loading" id="preview-frame"></iframe>
+    </div>
+  </div>
+</div>
+
+<script>
+const themeGrid = document.getElementById('theme-grid')
+const typoBody = document.getElementById('typo-body')
+const btnGenerate = document.getElementById('btn-generate')
+const statusEl = document.getElementById('status')
+const previewFrame = document.getElementById('preview-frame')
+const previewLoading = document.getElementById('preview-loading')
+
+let themesData = []
+let fontCatalog = []
+let textRoles = []
+let currentTypography = {}
+let debounceTimer = null
+let currentBlobUrl = null
+
+const WEIGHT_OPTIONS = [
+  { value: 300, label: 'Light' },
+  { value: 400, label: 'Regular' },
+  { value: 700, label: 'Bold' },
+]
+
+const PX_SIZES = [8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 20, 22, 24, 28, 32, 36]
+
+// ── Get current selections ──
+function getSelections() {
+  return {
+    themeId: document.querySelector('input[name="theme"]:checked')?.value || 'scrolls',
+    sizeKey: 'M',
+    lightMode: document.querySelector('input[name="mode"]:checked')?.value === 'light',
+    dataSource: document.querySelector('input[name="data"]:checked')?.value || 'baked',
+  }
+}
+
+// ── Typography table ──
+function buildTypoTable() {
+  typoBody.innerHTML = ''
+  for (const role of textRoles) {
+    const cfg = currentTypography[role.id]
+    if (!cfg) continue
+
+    const tr = document.createElement('tr')
+
+    // Role label
+    const tdRole = document.createElement('td')
+    tdRole.textContent = role.label
+    tr.appendChild(tdRole)
+
+    // Font dropdown
+    const tdFont = document.createElement('td')
+    const fontSelect = document.createElement('select')
+    fontSelect.dataset.role = role.id
+    fontSelect.dataset.field = 'font'
+    for (const f of fontCatalog) {
+      const opt = document.createElement('option')
+      opt.value = f.id
+      opt.textContent = f.name
+      if (f.id === cfg.fontId) opt.selected = true
+      fontSelect.appendChild(opt)
+    }
+    tdFont.appendChild(fontSelect)
+    tr.appendChild(tdFont)
+
+    // Weight dropdown (Light / Regular / Bold)
+    const tdWeight = document.createElement('td')
+    const weightSelect = document.createElement('select')
+    weightSelect.dataset.role = role.id
+    weightSelect.dataset.field = 'weight'
+    for (const w of WEIGHT_OPTIONS) {
+      const opt = document.createElement('option')
+      opt.value = w.value
+      opt.textContent = w.label
+      if (w.value === cfg.weight) opt.selected = true
+      weightSelect.appendChild(opt)
+    }
+    tdWeight.appendChild(weightSelect)
+    tr.appendChild(tdWeight)
+
+    // Size dropdown (standard px)
+    const tdSize = document.createElement('td')
+    const sizeSelect = document.createElement('select')
+    sizeSelect.dataset.role = role.id
+    sizeSelect.dataset.field = 'size'
+    for (const px of PX_SIZES) {
+      const opt = document.createElement('option')
+      opt.value = px
+      opt.textContent = px + 'px'
+      if (px === cfg.size) opt.selected = true
+      sizeSelect.appendChild(opt)
+    }
+    tdSize.appendChild(sizeSelect)
+    tr.appendChild(tdSize)
+
+    // Italic toggle
+    const tdItalic = document.createElement('td')
+    const italicBtn = document.createElement('button')
+    italicBtn.className = 'typo-italic-btn' + (cfg.italic ? ' active' : '')
+    italicBtn.textContent = 'I'
+    italicBtn.dataset.role = role.id
+    italicBtn.type = 'button'
+    tdItalic.appendChild(italicBtn)
+    tr.appendChild(tdItalic)
+
+    typoBody.appendChild(tr)
+  }
+
+  // Wire events
+  typoBody.querySelectorAll('select[data-field="font"]').forEach(sel => {
+    sel.addEventListener('change', () => {
+      currentTypography[sel.dataset.role].fontId = sel.value
+      schedulePreview()
+    })
+  })
+
+  typoBody.querySelectorAll('select[data-field="weight"]').forEach(sel => {
+    sel.addEventListener('change', () => {
+      currentTypography[sel.dataset.role].weight = parseInt(sel.value)
+      schedulePreview()
+    })
+  })
+
+  typoBody.querySelectorAll('select[data-field="size"]').forEach(sel => {
+    sel.addEventListener('change', () => {
+      currentTypography[sel.dataset.role].size = parseInt(sel.value)
+      schedulePreview()
+    })
+  })
+
+  typoBody.querySelectorAll('.typo-italic-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const roleId = btn.dataset.role
+      currentTypography[roleId].italic = !currentTypography[roleId].italic
+      btn.classList.toggle('active', currentTypography[roleId].italic)
+      schedulePreview()
+    })
+  })
+}
+
+function applyTypographyDefaults(theme) {
+  currentTypography = {}
+  for (const [roleId, cfg] of Object.entries(theme.typographyDefaults)) {
+    currentTypography[roleId] = { ...cfg }
+  }
+  buildTypoTable()
+}
+
+// ── Update preview iframe via POST + blob URL ──
+async function updatePreview() {
+  const sel = getSelections()
+  previewLoading.textContent = 'Loading...'
+  previewFrame.classList.remove('loaded')
+  previewFrame.classList.add('loading')
+
+  try {
+    const res = await fetch('/api/preview', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        themeId: sel.themeId,
+        sizeKey: sel.sizeKey,
+        lightMode: sel.lightMode,
+        typography: currentTypography,
+      }),
+    })
+    const html = await res.text()
+
+    // Revoke previous blob URL
+    if (currentBlobUrl) URL.revokeObjectURL(currentBlobUrl)
+    currentBlobUrl = URL.createObjectURL(new Blob([html], { type: 'text/html' }))
+    previewFrame.src = currentBlobUrl
+  } catch {
+    previewLoading.textContent = 'Preview failed'
+  }
+}
+
+function schedulePreview() {
+  clearTimeout(debounceTimer)
+  debounceTimer = setTimeout(updatePreview, 250)
+}
+
+// iframe loaded
+previewFrame.addEventListener('load', () => {
+  previewFrame.classList.remove('loading')
+  previewFrame.classList.add('loaded')
+  previewLoading.textContent = ''
+})
+
+// ── Listen for any control change ──
+function listenForChanges() {
+  document.querySelectorAll('input[name="theme"]').forEach(input => {
+    input.addEventListener('change', () => {
+      const theme = themesData.find(t => t.id === input.value)
+      if (theme) applyTypographyDefaults(theme)
+      schedulePreview()
+    })
+  })
+  document.querySelectorAll('input[name="mode"]').forEach(input => {
+    input.addEventListener('change', schedulePreview)
+  })
+}
+
+// ── Fetch themes + populate controls ──
+fetch('/api/themes')
+  .then(r => r.json())
+  .then(({ themes, sizes, fontCatalog: fc, textRoles: tr }) => {
+    themesData = themes
+    fontCatalog = fc
+    textRoles = tr
+
+    // Theme cards
+    themes.forEach((t, i) => {
+      const id = 'theme-' + t.id
+      const div = document.createElement('div')
+      div.className = 'theme-option'
+      div.innerHTML = `
+        <input type="radio" name="theme" id="${id}" value="${t.id}" ${i === 0 ? 'checked' : ''}>
+        <label for="${id}">
+          <div class="theme-name">${t.name}</div>
+          <div class="theme-desc">${t.description}</div>
+        </label>`
+      themeGrid.appendChild(div)
+    })
+
+    // Initialize typography from first theme's defaults
+    applyTypographyDefaults(themes[0])
+
+    listenForChanges()
+    updatePreview()
+  })
+
+// ── Generate ──
+btnGenerate.addEventListener('click', async () => {
+  const sel = getSelections()
+
+  btnGenerate.disabled = true
+  statusEl.className = 'status loading'
+  statusEl.innerHTML = sel.dataSource === 'baked' ? 'Fetching laws and generating...' : 'Generating...'
+
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        themeId: sel.themeId,
+        sizeKey: sel.sizeKey,
+        lightMode: sel.lightMode,
+        dataSource: sel.dataSource,
+        typography: currentTypography,
+      }),
+    })
+    const result = await res.json()
+    if (!result.ok) throw new Error(result.error)
+
+    const sizeStr = result.size > 512 * 1024
+      ? (result.size / 1024 / 1024).toFixed(1) + ' MB'
+      : (result.size / 1024).toFixed(0) + ' KB'
+
+    statusEl.className = 'status success'
+
+    // Handle both KV-based and direct HTML download
+    if (result.sessionId) {
+      // KV storage available - use session-based download
+      statusEl.innerHTML = `Generated (${sizeStr})<br><a class="download-link" href="/api/download?session=${result.sessionId}" download="torah-laws.html">Download</a>`
+    } else if (result.html) {
+      // No KV - create blob URL for direct download
+      const blob = new Blob([result.html], { type: 'text/html' })
+      const url = URL.createObjectURL(blob)
+      statusEl.innerHTML = `Generated (${sizeStr})<br><a class="download-link" href="${url}" download="torah-laws.html">Download</a>`
+    } else {
+      throw new Error('No download method available')
+    }
+  } catch (err) {
+    statusEl.className = 'status error'
+    statusEl.textContent = 'Error: ' + err.message
+  } finally {
+    btnGenerate.disabled = false
+  }
+})
+</script>
+</body>
+</html>

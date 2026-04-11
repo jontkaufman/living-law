@@ -1,39 +1,13 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react'
-import { ChevronLeft, Sparkles, X, Clock, BookOpen, Info, MessageSquare, Search, Mail, Send, List, BarChart3 } from 'lucide-react'
+import { ChevronLeft, Sparkles, Search, X, List, Columns2, BarChart3, Sun, Moon } from 'lucide-react'
+import LawSidePanel from './LawSidePanel'
+import {
+  LEVEL2_CONFIG, OBSERVANCE_CONFIG,
+  buildHierarchyTree, countAllLaws, collectAllLaws,
+  formatLabel, getShortTitle,
+} from '../lib/lawHelpers'
 import './NetworkGraphStyled.css'
 
-const FEEDBACK_API = '/api/feedback'
-
-// ── Level 2 category display config ──────────────────────────────────────────
-
-const LEVEL2_CONFIG = {
-  // LOVE GOD children (Ten Commandments 1-4) — warm gold/amber spectrum
-  'know-fear-cling':    { label: 'KNOW, FEAR & CLING', short: '(1)', color: [220, 190, 130] },
-  'no-idolatry':        { label: 'NO IDOLATRY', short: '(2)', color: [200, 170, 120] },
-  'gods-name':          { label: "GOD'S NAME", short: '(3)', color: [210, 180, 125] },
-  'sacred-times':       { label: 'SACRED TIMES', short: '(4)', color: [230, 195, 140] },
-  // LOVE NEIGHBOR children (Ten Commandments 5-10) — warm sage/earth spectrum
-  'honor-parents':      { label: 'HONOR PARENTS', short: '(5)', color: [170, 195, 130] },
-  'no-murder':          { label: 'DO NOT MURDER', short: '(6)', color: [155, 185, 125] },
-  'no-adultery':        { label: 'NO ADULTERY', short: '(7)', color: [185, 170, 130] },
-  'no-steal':           { label: 'DO NOT STEAL', short: '(8)', color: [195, 180, 120] },
-  'no-false-witness':   { label: 'NO FALSE WITNESS', short: '(9)', color: [190, 175, 125] },
-  'no-covet':           { label: 'DO NOT COVET', short: '(10)', color: [180, 165, 120] },
-}
-
-// ── Observance classification config ────────────────────────────────────────
-
-const OBSERVANCE_CONFIG = {
-  already_observing:       { label: 'Christians Already Do',       symbol: '✔', color: '#6bcf7f' },
-  should_observe:          { label: 'Should Observe',              symbol: '★', color: '#e0c060' },
-  situational:             { label: 'Situational',                 symbol: '◇', color: '#8ca0b4' },
-  observe_in_principle:    { label: 'Observe in Principle',        symbol: '○', color: '#c8a878' },
-  cannot_currently_observe:{ label: 'Cannot Currently Observe',    symbol: '⦸', color: '#c08888' },
-  aware_in_principle:      { label: 'Aware in Principle',          symbol: '△', color: '#9a9a9a' },
-  voluntary:               { label: 'Voluntary',                   symbol: '♡', color: '#b090d0' },
-}
-
-const SUBCATEGORY_THRESHOLD = 20
 const MAX_LAWS_SHOWN = 80
 
 // ── Tree layout constants ────────────────────────────────────────────────────
@@ -49,72 +23,7 @@ const LAW_LIST_X_OFFSET = -20  // left of parent center
 const LOVE_GOD_X = 600
 const LOVE_NEIGHBOR_X = 1800
 
-// ── Bible book number → name (bolls.life uses numeric book IDs) ──────────────
-
-const BOOK_NAMES = {
-  1: 'Genesis', 2: 'Exodus', 3: 'Leviticus', 4: 'Numbers', 5: 'Deuteronomy',
-  6: 'Joshua', 7: 'Judges', 8: 'Ruth', 9: '1 Samuel', 10: '2 Samuel',
-  11: '1 Kings', 12: '2 Kings', 13: '1 Chronicles', 14: '2 Chronicles',
-  15: 'Ezra', 16: 'Nehemiah', 17: 'Esther', 18: 'Job', 19: 'Psalms',
-  20: 'Proverbs', 21: 'Ecclesiastes', 22: 'Song of Solomon', 23: 'Isaiah',
-  24: 'Jeremiah', 25: 'Lamentations', 26: 'Ezekiel', 27: 'Daniel',
-  28: 'Hosea', 29: 'Joel', 30: 'Amos', 31: 'Obadiah', 32: 'Jonah',
-  33: 'Micah', 34: 'Nahum', 35: 'Habakkuk', 36: 'Zephaniah', 37: 'Haggai',
-  38: 'Zechariah', 39: 'Malachi', 40: 'Matthew', 41: 'Mark', 42: 'Luke',
-  43: 'John', 44: 'Acts', 45: 'Romans', 46: '1 Corinthians',
-  47: '2 Corinthians', 48: 'Galatians', 49: 'Ephesians', 50: 'Philippians',
-  51: 'Colossians', 52: '1 Thessalonians', 53: '2 Thessalonians',
-  54: '1 Timothy', 55: '2 Timothy', 56: 'Titus', 57: 'Philemon',
-  58: 'Hebrews', 59: 'James', 60: '1 Peter', 61: '2 Peter', 62: '1 John',
-  63: '2 John', 64: '3 John', 65: 'Jude', 66: 'Revelation',
-  67: '1 Esdras', 68: 'Tobit', 69: 'Judith', 70: 'Wisdom of Solomon',
-  71: 'Sirach', 72: "Jeremy's Letter", 73: 'Baruch', 74: '1 Maccabees',
-  75: '2 Maccabees', 76: '3 Maccabees', 77: '2 Esdras', 78: 'Susanna',
-  79: 'Bel and the Dragon', 80: '4 Maccabees',
-  81: 'Greek Additions to Esther', 82: "3 Holy Children's Song",
-  83: 'Prayer of Manasses',
-}
-
-const STOP_WORDS = new Set([
-  'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for',
-  'of', 'with', 'by', 'from', 'is', 'it', 'its', 'that', 'this', 'was',
-  'are', 'be', 'has', 'had', 'have', 'he', 'she', 'his', 'her', 'him',
-  'you', 'your', 'they', 'them', 'their', 'we', 'our', 'who', 'whom',
-  'which', 'what', 'will', 'shall', 'may', 'not', 'no', 'nor', 'if',
-  'as', 'so', 'do', 'did', 'does', 'been', 'being', 'were', 'am', 'i',
-  'me', 'my', 'all', 'each', 'every', 'any', 'one', 'two', 'into',
-  'out', 'up', 'also', 'than', 'then', 'said', 'says', 'say', 'when',
-  'there', 'here', 'more', 'must', 'about', 'over', 'such', 'after',
-  'before', 'these', 'those', 'own', 'how', 'because', 'would', 'could',
-  'should', 'make', 'can', 'upon', 'let', 'us', 'come', 'came', 'give',
-  'gave', 'take', 'took', 'went', 'go', 'among', 'through', 'under',
-])
-
-function extractKeywords(text, maxCount = 12) {
-  if (!text) return []
-  const words = text
-    .replace(/["""''.,;:!?()[\]{}<>—–\-\/\\]/g, ' ')
-    .split(/\s+/)
-    .map(w => w.toLowerCase().trim())
-    .filter(w => w.length > 3 && !STOP_WORDS.has(w) && !/^\d+$/.test(w))
-  // Deduplicate, keep order
-  const seen = new Set()
-  const unique = []
-  for (const w of words) {
-    if (!seen.has(w)) { seen.add(w); unique.push(w) }
-  }
-  return unique.slice(0, maxCount)
-}
-
 // ── Helpers ──────────────────────────────────────────────────────────────────
-
-function getShortTitle(law, maxLen = 50) {
-  let title = law.law_summary || law.reference
-  title = title.replace(/^(The law that|Law that|Command to|Requirement to|Prohibition against|You shall|You must|Do not)\s+/i, '')
-  title = title.charAt(0).toUpperCase() + title.slice(1)
-  if (title.length > maxLen) title = title.substring(0, maxLen) + '...'
-  return title
-}
 
 function positionLawList(laws, parentX, startY) {
   return laws.map((_, i) => ({
@@ -132,8 +41,25 @@ function positionChildren(count, centerX, y, spacing) {
   }))
 }
 
+// Simple hash for deterministic per-node phase
+function hashStr(s) {
+  let h = 0
+  for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0
+  return h
+}
+
 function drawStar(ctx, x, y, rgb, coreRadius, glowRadius, intensity = 1.0) {
   const [r, g, b] = rgb
+
+  // Atmospheric halo — very wide, barely visible
+  const haloRadius = glowRadius * 2
+  const halo = ctx.createRadialGradient(x, y, 0, x, y, haloRadius)
+  halo.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${0.012 * intensity})`)
+  halo.addColorStop(0.5, `rgba(${r}, ${g}, ${b}, ${0.006 * intensity})`)
+  halo.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`)
+  ctx.fillStyle = halo
+  ctx.fillRect(x - haloRadius, y - haloRadius, haloRadius * 2, haloRadius * 2)
+
   const outerGlow = ctx.createRadialGradient(x, y, 0, x, y, glowRadius)
   outerGlow.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${0.3 * intensity})`)
   outerGlow.addColorStop(0.3, `rgba(${r}, ${g}, ${b}, ${0.1 * intensity})`)
@@ -150,49 +76,25 @@ function drawStar(ctx, x, y, rgb, coreRadius, glowRadius, intensity = 1.0) {
   ctx.fillRect(x - coreRadius, y - coreRadius, coreRadius * 2, coreRadius * 2)
 }
 
-function formatLabel(key) {
-  return key.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
-}
-
-// ── Build hierarchy tree from category paths ─────────────────────────────────
-
-function buildHierarchyTree(laws) {
-  // tree[root][level2][level3][level4] = { laws: [], children: {} }
-  const tree = {}
-
-  laws.forEach(law => {
-    const paths = law.categories || []
-    paths.forEach(path => {
-      const parts = path.split(' > ').map(s => s.trim())
-      let node = tree
-      parts.forEach((part, depth) => {
-        if (!node[part]) node[part] = { _laws: [], _children: {} }
-        if (depth === parts.length - 1) {
-          node[part]._laws.push(law)
-        }
-        node = node[part]._children
-      })
-    })
-  })
-
-  return tree
-}
-
 // ── Component ────────────────────────────────────────────────────────────────
 
-function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwitchView }) {
+function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwitchView, navState, onNavChange, lightMode, onToggleTheme }) {
   const canvasRef = useRef(null)
   const animFrameRef = useRef(null)
+  const lightModeRef = useRef(false)
 
-  // Tree navigation state
-  const [expandedL2, setExpandedL2] = useState(null)     // e.g. "SACRED_TIMES"
-  const [expandedL3, setExpandedL3] = useState(null)     // e.g. "Weekly Sabbath"
-  const [expandedL4, setExpandedL4] = useState(null)     // e.g. "Rest and Work Prohibition"
+  // Internal tree navigation state (used in standalone mode)
+  const [_expandedL2, _setExpandedL2] = useState(null)
+  const [_expandedL3, _setExpandedL3] = useState(null)
+  const [_expandedL4, _setExpandedL4] = useState(null)
   const [activePath, setActivePath] = useState(new Set())
   const [breadcrumbs, setBreadcrumbs] = useState(['Torah Laws'])
 
-  // Side panel tab state
-  const [sideTab, setSideTab] = useState('study')  // 'study' | 'details'
+  // Controlled vs uncontrolled
+  const isControlled = !!navState
+  const expandedL2 = isControlled ? navState.expandedL2 : _expandedL2
+  const expandedL3 = isControlled ? navState.expandedL3 : _expandedL3
+  const expandedL4 = isControlled ? navState.expandedL4 : _expandedL4
 
   // Search state
   const [searchQuery, setSearchQuery] = useState('')
@@ -200,81 +102,7 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
   const searchInputRef = useRef(null)
 
   // Observance legend state
-  const [showObservanceLegend, setShowObservanceLegend] = useState(false)
-
-  // Verse lookup state
-  const [fetchedVerse, setFetchedVerse] = useState(null)  // { reference, text, loading, error }
-  const [verseCache, setVerseCache] = useState({})         // cache by reference string
-  const [keywordResults, setKeywordResults] = useState(null) // { keyword, results[], loading, error }
-
-  // Feedback dialog state
-  const [showFeedback, setShowFeedback] = useState(false)
-  const [feedbackName, setFeedbackName] = useState('')
-  const [feedbackEmail, setFeedbackEmail] = useState('')
-  const [feedbackMessage, setFeedbackMessage] = useState('')
-  const [feedbackContext, setFeedbackContext] = useState('')  // law reference if from side panel
-  const [feedbackSending, setFeedbackSending] = useState(false)
-  const [feedbackSent, setFeedbackSent] = useState(false)
-  const [feedbackError, setFeedbackError] = useState('')
-
-  // Fetch a verse from bible-api.com
-  const fetchVerse = useCallback((ref) => {
-    // Clean the reference: strip parenthetical notes, trim
-    const cleanRef = ref.replace(/\s*\(.*?\)\s*/g, '').trim()
-    if (!cleanRef) return
-
-    // Check cache
-    if (verseCache[cleanRef]) {
-      setFetchedVerse({ reference: cleanRef, text: verseCache[cleanRef], loading: false, error: null })
-      return
-    }
-
-    setFetchedVerse({ reference: cleanRef, text: null, loading: true, error: null })
-
-    const apiRef = cleanRef.replace(/\s+/g, '+')
-    fetch(`https://bible-api.com/${encodeURIComponent(apiRef)}`)
-      .then(res => {
-        if (!res.ok) throw new Error('Verse not found')
-        return res.json()
-      })
-      .then(data => {
-        const text = data.text?.trim()
-        if (!text) throw new Error('No text returned')
-        setVerseCache(prev => ({ ...prev, [cleanRef]: text }))
-        setFetchedVerse({ reference: data.reference || cleanRef, text, loading: false, error: null })
-      })
-      .catch(() => {
-        setFetchedVerse({ reference: cleanRef, text: null, loading: false, error: 'Could not load verse' })
-      })
-  }, [verseCache])
-
-  // Search Bible by keyword via bolls.life
-  const searchKeyword = useCallback((keyword) => {
-    setKeywordResults({ keyword, results: [], loading: true, error: null })
-    fetch(`https://bolls.life/search/WEB/${encodeURIComponent(keyword)}/`)
-      .then(res => {
-        if (!res.ok) throw new Error('Search failed')
-        return res.json()
-      })
-      .then(data => {
-        const results = (data || []).slice(0, 20).map(v => ({
-          reference: `${BOOK_NAMES[v.book] || `Book ${v.book}`} ${v.chapter}:${v.verse}`,
-          text: (v.text || '').replace(/<\/?mark>/g, ''),
-          highlighted: v.text || '',
-        }))
-        setKeywordResults({ keyword, results, loading: false, error: null })
-      })
-      .catch(() => {
-        setKeywordResults({ keyword, results: [], loading: false, error: 'Search failed' })
-      })
-  }, [])
-
-  // Reset panel state when law changes
-  useEffect(() => {
-    setFetchedVerse(null)
-    setKeywordResults(null)
-    setSideTab('study')
-  }, [selectedLaw])
+  const [showObservanceLegend, setShowObservanceLegend] = useState(true)
 
   // Canvas refs
   const nodesRef = useRef([])
@@ -289,6 +117,10 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
   const isPanningRef = useRef(false)
   const lastMouseRef = useRef({ x: 0, y: 0 })
   const initializedRef = useRef(false)
+  const knownNodesRef = useRef(new Set()) // track known node IDs for entrance animation
+
+  // Keep lightMode ref in sync for render loop
+  lightModeRef.current = lightMode
 
   // Build hierarchy from data
   const hierarchy = useMemo(() => buildHierarchyTree(laws), [laws])
@@ -356,9 +188,13 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
     const l3Key = parts[2] || null
     const l4Key = parts[3] || null
 
-    setExpandedL2(l2Key)
-    setExpandedL3(l3Key)
-    setExpandedL4(l4Key)
+    if (isControlled) {
+      onNavChange({ expandedRoot: rootKey, expandedL2: l2Key, expandedL3: l3Key, expandedL4: l4Key })
+    } else {
+      _setExpandedL2(l2Key)
+      _setExpandedL3(l3Key)
+      _setExpandedL4(l4Key)
+    }
 
     // Build active path — root through to the selected law
     const path = new Set()
@@ -392,7 +228,7 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
       const rootCenterX = rootKey === 'love-god' ? LOVE_GOD_X : LOVE_NEIGHBOR_X
       focusOnArea(rootCenterX - 350, deepestLevel - 100, rootCenterX + 550, lawY + 300)
     }, 50)
-  }, [onSelectLaw, focusOnArea])
+  }, [onSelectLaw, focusOnArea, isControlled, onNavChange])
 
   // ── Build visual tree ─────────────────────────────────────────────────────
 
@@ -589,12 +425,112 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
       }
     }
 
+    // Assign phase, drift, and birthTime to each node
+    const now = performance.now()
+    const known = knownNodesRef.current
+    nodes.forEach(n => {
+      const h = hashStr(n.id)
+      n.phase = (Math.abs(h) % 1000) / 1000 * Math.PI * 2
+      n.drift = n.type === 'law' || n.type === 'more' ? 0 : n.type === 'great-command' ? 2 : 3
+      if (known.has(n.id)) {
+        n.birthTime = 0 // already known, no entrance anim
+      } else {
+        n.birthTime = now
+        known.add(n.id)
+      }
+    })
+
     nodesRef.current = nodes
     edgesRef.current = edges
   }, [expandedL2, expandedL3, expandedL4, laws, hierarchy, l2Counts])
 
   // Rebuild tree when state changes
   useEffect(() => { buildTree() }, [buildTree])
+
+  // ── Sync camera when navState changes externally (split view) ───────────
+  const prevNavRef = useRef(null)
+  useEffect(() => {
+    if (!isControlled) return
+    const prev = prevNavRef.current
+    prevNavRef.current = navState
+
+    // Skip initial mount
+    if (!prev) return
+    // Skip if nothing changed
+    if (prev.expandedL2 === navState.expandedL2 &&
+        prev.expandedL3 === navState.expandedL3 &&
+        prev.expandedL4 === navState.expandedL4) return
+
+    // Update breadcrumbs and active path to match new nav state
+    const rootKey = navState.expandedRoot || (navState.expandedL2 ? (
+      hierarchy['love-god']?._children?.[navState.expandedL2] ? 'love-god' : 'love-neighbor'
+    ) : null)
+
+    const crumbs = ['Torah Laws']
+    const path = new Set()
+    if (rootKey) {
+      crumbs.push(rootKey === 'love-god' ? 'LOVE YHWH' : 'LOVE YOUR NEIGHBOR')
+      path.add(rootKey)
+    }
+    if (navState.expandedL2) {
+      const config = LEVEL2_CONFIG[navState.expandedL2]
+      crumbs.push(config ? config.label : formatLabel(navState.expandedL2))
+      path.add(`l2-${navState.expandedL2}`)
+    }
+    if (navState.expandedL3) {
+      crumbs.push(formatLabel(navState.expandedL3))
+      path.add(`l3-${navState.expandedL3}`)
+    }
+    if (navState.expandedL4) {
+      crumbs.push(formatLabel(navState.expandedL4))
+      path.add(`l4-${navState.expandedL4}`)
+    }
+    setBreadcrumbs(crumbs)
+    setActivePath(path)
+
+    // Focus camera on the newly expanded area after tree rebuilds
+    setTimeout(() => {
+      if (!navState.expandedL2) {
+        focusOnFullTree()
+        return
+      }
+
+      // Find root and position for the L2 node
+      const l2Root = rootKey || 'love-god'
+      const centerX = l2Root === 'love-god' ? LOVE_GOD_X : LOVE_NEIGHBOR_X
+      const l2Data = hierarchy[l2Root]?._children?.[navState.expandedL2]
+
+      if (navState.expandedL4 && navState.expandedL3 && l2Data) {
+        const l3Data = l2Data._children?.[navState.expandedL3]
+        const l4Data = l3Data?._children?.[navState.expandedL4]
+        const lawCount = l4Data ? Math.min(countAllLaws(l4Data), MAX_LAWS_SHOWN) : 0
+        const listHeight = lawCount * LAW_ROW_HEIGHT
+        const lawY = LEVEL4_Y + LAW_Y_OFFSET
+        focusOnArea(centerX - 350, LEVEL4_Y - 80, centerX + 550, lawY + listHeight + 40)
+      } else if (navState.expandedL3 && l2Data) {
+        const l3Data = l2Data._children?.[navState.expandedL3]
+        const childCount = l3Data ? Object.keys(l3Data._children).length : 0
+        if (childCount > 0) {
+          const halfWidth = Math.max(childCount * 55 + 100, 400)
+          focusOnArea(centerX - halfWidth, LEVEL3_Y - 80, centerX + halfWidth, LEVEL4_Y + 80)
+        } else {
+          const lawCount = l3Data ? Math.min(countAllLaws(l3Data), MAX_LAWS_SHOWN) : 0
+          const listHeight = lawCount * LAW_ROW_HEIGHT
+          focusOnArea(centerX - 80, LEVEL3_Y - 80, centerX + 550, LEVEL4_Y + listHeight + 40)
+        }
+      } else if (l2Data) {
+        const childCount = Object.keys(l2Data._children).length
+        if (childCount > 0) {
+          const halfWidth = Math.max(childCount * 70 + 100, 400)
+          focusOnArea(centerX - halfWidth, LEVEL2_Y - 80, centerX + halfWidth, LEVEL3_Y + 80)
+        } else {
+          const lawCount = Math.min(l2Data?._laws?.length || 0, MAX_LAWS_SHOWN)
+          const listHeight = lawCount * LAW_ROW_HEIGHT
+          focusOnArea(centerX - 80, LEVEL2_Y - 80, centerX + 550, LEVEL3_Y + listHeight + 40)
+        }
+      }
+    }, 50)
+  }, [isControlled, navState, hierarchy, focusOnArea, focusOnFullTree])
 
   // Initial focus
   useEffect(() => {
@@ -618,8 +554,11 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
     if (!canvas) return
     const ctx = canvas.getContext('2d')
     const dpr = window.devicePixelRatio || 1
+    const now = performance.now()
+    const timeSec = now / 1000
 
-    const lerp = 0.1
+    // Smoother camera lerp
+    const lerp = 0.08
     panRef.current.x += (targetPanRef.current.x - panRef.current.x) * lerp
     panRef.current.y += (targetPanRef.current.y - panRef.current.y) * lerp
     zoomRef.current += (targetZoomRef.current - zoomRef.current) * lerp
@@ -638,51 +577,92 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
     const edges = edgesRef.current
     const pathSet = activePath
 
-    // Draw edges (skip law-to-law vertical connectors, draw a single line instead)
+    // Helper: get node position with organic drift applied
+    const getNodePos = (node) => {
+      if (!node) return { x: 0, y: 0 }
+      const drift = node.drift || 0
+      if (drift === 0) return { x: node.x, y: node.y }
+      const phase = node.phase || 0
+      return {
+        x: node.x + drift * Math.sin(timeSec * 0.3 + phase),
+        y: node.y + drift * Math.cos(timeSec * 0.4 + phase * 1.3),
+      }
+    }
+
+    // Helper: entrance animation scale (0→1 over 400ms, ease-out cubic)
+    const getEntranceScale = (node) => {
+      if (!node.birthTime) return 1
+      const age = now - node.birthTime
+      if (age >= 400) return 1
+      const t = Math.min(age / 400, 1)
+      return 1 - (1 - t) * (1 - t) * (1 - t) // ease-out cubic
+    }
+
+    // ── Draw edges with bezier curves ──
     edges.forEach(edge => {
-      if (edge.lawEdge) return // skip law-to-law connectors
+      if (edge.lawEdge) return
       const source = nodes.find(n => n.id === edge.source)
       const target = nodes.find(n => n.id === edge.target)
       if (!source || !target) return
-      // For edges to law nodes, glow if the parent category is on the path
-      // (the parent→first-law edge should glow when ANY law in that list is selected)
+
+      const sp = getNodePos(source)
+      const tp = getNodePos(target)
+      const entranceAlpha = Math.min(getEntranceScale(source), getEntranceScale(target))
+
       const isOnPath = target.type === 'law'
         ? pathSet.has(edge.source)
         : pathSet.has(edge.source) && pathSet.has(edge.target)
       const [r, g, b] = source.color
 
+      // Build curved path
       ctx.beginPath()
-      if (target.type === 'law') {
-        // Draw a single vertical line from parent down to the law list
-        ctx.moveTo(source.x, source.y)
-        ctx.lineTo(target.x, target.y)
+      ctx.moveTo(sp.x, sp.y)
+      if (edge.subtle) {
+        // Root-to-root bridge arc
+        const cpY = Math.min(sp.y, tp.y) - 40
+        const cpX = (sp.x + tp.x) / 2
+        ctx.quadraticCurveTo(cpX, cpY, tp.x, tp.y)
+      } else if (target.type === 'law') {
+        // Category→first law: gentle S-curve descent
+        const dy = tp.y - sp.y
+        const cp1x = sp.x, cp1y = sp.y + dy * 0.35
+        const cp2x = tp.x, cp2y = tp.y - dy * 0.35
+        ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, tp.x, tp.y)
       } else {
-        ctx.moveTo(source.x, source.y)
-        ctx.lineTo(target.x, target.y)
+        // Category→category: quadratic arc
+        const midY = (sp.y + tp.y) / 2
+        const dx = tp.x - sp.x
+        const cpX = (sp.x + tp.x) / 2 + dx * 0.08
+        ctx.quadraticCurveTo(cpX, midY, tp.x, tp.y)
       }
 
       if (isOnPath) {
-        ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, 0.8)`
+        // Edge glow — wide, soft underlay
+        ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${0.15 * entranceAlpha})`
+        ctx.lineWidth = 8
+        ctx.shadowBlur = 0
+        ctx.stroke()
+        // Bright edge on top
+        ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${0.8 * entranceAlpha})`
         ctx.lineWidth = 3
         ctx.shadowColor = `rgba(${r}, ${g}, ${b}, 0.6)`
         ctx.shadowBlur = 16
+        ctx.stroke()
+        ctx.shadowBlur = 0
       } else if (edge.subtle) {
-        ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, 0.06)`
+        ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${0.06 * entranceAlpha})`
         ctx.lineWidth = 0.5
-        ctx.shadowBlur = 0
+        ctx.stroke()
       } else {
-        ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, 0.18)`
+        ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${0.18 * entranceAlpha})`
         ctx.lineWidth = 1
-        ctx.shadowBlur = 0
+        ctx.stroke()
       }
-      ctx.stroke()
-      ctx.shadowBlur = 0
     })
 
-    // Draw a vertical guide line through law lists
+    // ── Draw vertical guide line through law lists (with subtle curve) ──
     const lawNodes = nodes.filter(n => n.type === 'law')
     if (lawNodes.length > 0) {
-      // Group law nodes by x position (same list)
       const groups = {}
       lawNodes.forEach(n => {
         const key = Math.round(n.x)
@@ -695,43 +675,55 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
         const first = group[0]
         const last = group[group.length - 1]
         const [r, g, b] = first.color
+        // Slight inward arc
+        const midY = (first.y + last.y) / 2
+        const arcX = first.x - 5 - 6
         ctx.beginPath()
         ctx.moveTo(first.x - 5, first.y)
-        ctx.lineTo(last.x - 5, last.y)
+        ctx.quadraticCurveTo(arcX, midY, last.x - 5, last.y)
         ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, 0.1)`
         ctx.lineWidth = 1
         ctx.stroke()
       })
     }
 
-    // Draw non-law nodes as stars
+    // ── Draw non-law nodes as stars (with breathing + entrance anim) ──
     ctx.globalCompositeOperation = 'lighter'
     nodes.forEach(node => {
-      if (node.type === 'law') return // draw separately
+      if (node.type === 'law') return
+      const pos = getNodePos(node)
+      const scale = getEntranceScale(node)
       const isOnPath = pathSet.has(node.id)
       const isHovered = hoveredRef.current === node.id
-      const baseIntensity = isOnPath ? 1.0 : 0.85
-      const intensity = baseIntensity * (isHovered ? 1.3 : 1.0)
-      const glow = node.glowRadius * (isHovered ? 1.25 : 1.0)
-      drawStar(ctx, node.x, node.y, node.color, node.coreRadius, glow, intensity)
+
+      // Subtle brightness pulsing
+      const breathe = 0.05 * Math.sin(timeSec * 0.8 + (node.phase || 0) * 2)
+      const baseIntensity = (isOnPath ? 1.0 : 0.85) + breathe
+      const intensity = baseIntensity * (isHovered ? 1.3 : 1.0) * scale
+      const glow = node.glowRadius * (isHovered ? 1.25 : 1.0) * scale
+      const core = node.coreRadius * scale
+
+      drawStar(ctx, pos.x, pos.y, node.color, core, glow, intensity)
     })
     ctx.globalCompositeOperation = 'source-over'
 
-    // Draw non-law labels (centered below star)
+    // ── Draw non-law labels (centered below star) ──
     ctx.textAlign = 'center'
     ctx.textBaseline = 'top'
     nodes.forEach(node => {
-      if (node.type === 'law') return // draw separately
+      if (node.type === 'law') return
+      const pos = getNodePos(node)
+      const scale = getEntranceScale(node)
       const isOnPath = pathSet.has(node.id)
       const isHovered = hoveredRef.current === node.id
       const [r, g, b] = node.color
 
-      const labelAlpha = isHovered ? 0.95
+      const labelAlpha = (isHovered ? 0.95
         : isOnPath ? 0.9
         : node.type === 'great-command' ? 0.75
         : node.type === 'level2' ? 0.65
         : node.type === 'level3' || node.type === 'level4' ? 0.6
-        : 0.5
+        : 0.5) * scale
 
       const fontSize = node.type === 'great-command' ? 18
         : node.type === 'level2' ? 14
@@ -740,52 +732,50 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
 
       ctx.font = `${fontSize}px 'Inter', 'Segoe UI', system-ui, sans-serif`
       ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${labelAlpha})`
-      const labelY = node.y + node.coreRadius + 12
-      ctx.fillText(node.label, node.x, labelY)
+      const labelY = pos.y + node.coreRadius * scale + 12
+      ctx.fillText(node.label, pos.x, labelY)
 
       if (node.sublabel) {
         ctx.font = `${fontSize - 2}px 'Inter', 'Segoe UI', system-ui, sans-serif`
         ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${labelAlpha * 0.65})`
-        ctx.fillText(node.sublabel, node.x, labelY + fontSize + 3)
+        ctx.fillText(node.sublabel, pos.x, labelY + fontSize + 3)
       }
     })
 
-    // Draw law rows: small dot + reference + title per row
+    // ── Draw law rows: small dot + reference + title per row ──
     ctx.textBaseline = 'middle'
     nodes.forEach(node => {
       if (node.type !== 'law') return
       const isOnPath = pathSet.has(node.id)
       const isHovered = hoveredRef.current === node.id
       const [r, g, b] = node.color
+      const scale = getEntranceScale(node)
 
-      const alpha = isHovered ? 0.95 : isOnPath ? 0.9 : 0.7
+      const alpha = (isHovered ? 0.95 : isOnPath ? 0.9 : 0.7) * scale
       const bgAlpha = isHovered ? 0.08 : 0
 
-      // Hover highlight background
       if (bgAlpha > 0) {
         ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${bgAlpha})`
         ctx.fillRect(node.x - 8, node.y - LAW_ROW_HEIGHT / 2, 500, LAW_ROW_HEIGHT)
       }
 
-      // Small dot
       ctx.beginPath()
       ctx.arc(node.x, node.y, 4, 0, Math.PI * 2)
       ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`
       ctx.fill()
 
-      // Reference (bold-ish)
       ctx.textAlign = 'left'
       ctx.font = `600 20px 'Inter', 'Segoe UI', system-ui, sans-serif`
       ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`
       ctx.fillText(node.refLabel || '', node.x + 14, node.y)
 
-      // Title
       const refWidth = node.refLabel ? ctx.measureText(node.refLabel).width + 14 : 0
       ctx.font = `18px 'Inter', 'Segoe UI', system-ui, sans-serif`
-      ctx.fillStyle = `rgba(235, 225, 205, ${alpha * 0.8})`
+      ctx.fillStyle = lightModeRef.current
+        ? `rgba(60, 50, 30, ${alpha * 0.8})`
+        : `rgba(235, 225, 205, ${alpha * 0.8})`
       ctx.fillText(node.label, node.x + 14 + refWidth, node.y)
 
-      // Observance icon
       const obsClass = node.data?.observance_class
       const obsConfig = obsClass ? OBSERVANCE_CONFIG[obsClass] : null
       if (obsConfig) {
@@ -811,16 +801,21 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
 
   const nodeAt = useCallback((wx, wy) => {
     const nodes = nodesRef.current
+    const timeSec = performance.now() / 1000
     for (let i = nodes.length - 1; i >= 0; i--) {
       const n = nodes[i]
       if (n.type === 'law') {
-        // Rectangular hit area for law rows
         if (wx >= n.x - 10 && wx <= n.x + 500 &&
             wy >= n.y - LAW_ROW_HEIGHT / 2 && wy <= n.y + LAW_ROW_HEIGHT / 2) {
           return n
         }
       } else {
-        const dx = wx - n.x, dy = wy - n.y
+        // Account for drift offset in hit testing
+        const drift = n.drift || 0
+        const phase = n.phase || 0
+        const nx = n.x + drift * Math.sin(timeSec * 0.3 + phase)
+        const ny = n.y + drift * Math.cos(timeSec * 0.4 + phase * 1.3)
+        const dx = wx - nx, dy = wy - ny
         const hitRadius = Math.max(n.glowRadius * 0.5, 20)
         if (dx * dx + dy * dy < hitRadius * hitRadius) return n
       }
@@ -842,11 +837,26 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
 
   // ── Click handler ────────────────────────────────────────────────────────
 
+  // Helpers for setting nav state (controlled vs internal)
+  const setNav = useCallback((l2, l3, l4) => {
+    if (isControlled) {
+      // Determine root from l2 key
+      let root = navState.expandedRoot
+      if (l2) {
+        const godChildren = hierarchy['love-god']?._children || {}
+        root = godChildren[l2] ? 'love-god' : 'love-neighbor'
+      } else if (!l2 && !l3 && !l4) {
+        root = navState.expandedRoot // keep root when collapsing
+      }
+      onNavChange({ expandedRoot: root, expandedL2: l2, expandedL3: l3, expandedL4: l4 })
+    } else {
+      _setExpandedL2(l2); _setExpandedL3(l3); _setExpandedL4(l4)
+    }
+  }, [isControlled, navState, onNavChange, hierarchy])
+
   const handleNodeClick = useCallback((node) => {
     if (node.type === 'great-command') {
-      setExpandedL2(null)
-      setExpandedL3(null)
-      setExpandedL4(null)
+      setNav(null, null, null)
       setActivePath(new Set([node.id]))
       setBreadcrumbs(['Torah Laws'])
 
@@ -860,23 +870,17 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
     } else if (node.type === 'level2') {
       const l2Key = node.l2Key
       if (expandedL2 === l2Key) {
-        // Collapse
-        setExpandedL2(null)
-        setExpandedL3(null)
-        setExpandedL4(null)
+        setNav(null, null, null)
         setActivePath(new Set())
         setBreadcrumbs(['Torah Laws'])
         focusOnFullTree()
       } else {
-        setExpandedL2(l2Key)
-        setExpandedL3(null)
-        setExpandedL4(null)
+        setNav(l2Key, null, null)
         const rootId = node.rootId
         const config = LEVEL2_CONFIG[l2Key] || { label: formatLabel(l2Key) }
         setActivePath(buildActivePath(rootId, l2Key))
         setBreadcrumbs(['Torah Laws', rootId === 'love-god' ? 'LOVE YHWH' : 'LOVE NEIGHBOR', config.label])
 
-        // Focus — if subcategories exist use horizontal spread, otherwise vertical law list
         const l2Data = hierarchy[rootId]?._children[l2Key]
         const childCount = l2Data ? Object.keys(l2Data._children).length : 0
         if (childCount > 0) {
@@ -892,15 +896,13 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
     } else if (node.type === 'level3') {
       const l3Key = node.l3Key
       if (expandedL3 === l3Key) {
-        setExpandedL3(null)
-        setExpandedL4(null)
+        setNav(expandedL2, null, null)
         const rootKey = Object.keys(hierarchy).find(r =>
           hierarchy[r]._children[expandedL2])
         setActivePath(buildActivePath(rootKey, expandedL2))
         setBreadcrumbs(prev => prev.slice(0, 3))
       } else {
-        setExpandedL3(l3Key)
-        setExpandedL4(null)
+        setNav(expandedL2, l3Key, null)
         const rootKey = Object.keys(hierarchy).find(r =>
           hierarchy[r]._children[expandedL2])
         setActivePath(buildActivePath(rootKey, expandedL2, l3Key))
@@ -921,13 +923,13 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
     } else if (node.type === 'level4') {
       const l4Key = node.l4Key
       if (expandedL4 === l4Key) {
-        setExpandedL4(null)
+        setNav(expandedL2, expandedL3, null)
         const rootKey = Object.keys(hierarchy).find(r =>
           hierarchy[r]._children[expandedL2])
         setActivePath(buildActivePath(rootKey, expandedL2, expandedL3))
         setBreadcrumbs(prev => prev.slice(0, 4))
       } else {
-        setExpandedL4(l4Key)
+        setNav(expandedL2, expandedL3, l4Key)
         const rootKey = Object.keys(hierarchy).find(r =>
           hierarchy[r]._children[expandedL2])
         setActivePath(buildActivePath(rootKey, expandedL2, expandedL3, l4Key))
@@ -945,7 +947,7 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
         hierarchy[r]._children[expandedL2])
       setActivePath(buildActivePath(rootKey, expandedL2, expandedL3, expandedL4, node.data.id))
     }
-  }, [expandedL2, expandedL3, expandedL4, hierarchy, laws, onSelectLaw, focusOnArea, focusOnFullTree, buildActivePath])
+  }, [expandedL2, expandedL3, expandedL4, hierarchy, laws, onSelectLaw, focusOnArea, focusOnFullTree, buildActivePath, setNav])
 
   // Keep ref in sync so canvas event handlers always call the latest version
   handleNodeClickRef.current = handleNodeClick
@@ -1102,27 +1104,27 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
 
   const navigateTo = useCallback((level) => {
     if (level === 0) {
-      setExpandedL2(null); setExpandedL3(null); setExpandedL4(null)
+      setNav(null, null, null)
       setActivePath(new Set())
       setBreadcrumbs(['Torah Laws'])
       focusOnFullTree()
     } else if (level === 1) {
-      setExpandedL2(null); setExpandedL3(null); setExpandedL4(null)
+      setNav(null, null, null)
       setActivePath(new Set())
       setBreadcrumbs(prev => prev.slice(0, 2))
       focusOnFullTree()
     } else if (level === 2) {
-      setExpandedL3(null); setExpandedL4(null)
+      setNav(expandedL2, null, null)
       const rootKey = Object.keys(hierarchy).find(r => hierarchy[r]._children[expandedL2])
       setActivePath(buildActivePath(rootKey, expandedL2))
       setBreadcrumbs(prev => prev.slice(0, 3))
     } else if (level === 3) {
-      setExpandedL4(null)
+      setNav(expandedL2, expandedL3, null)
       const rootKey = Object.keys(hierarchy).find(r => hierarchy[r]._children[expandedL2])
       setActivePath(buildActivePath(rootKey, expandedL2, expandedL3))
       setBreadcrumbs(prev => prev.slice(0, 4))
     }
-  }, [expandedL2, expandedL3, hierarchy, focusOnFullTree, buildActivePath])
+  }, [expandedL2, expandedL3, hierarchy, focusOnFullTree, buildActivePath, setNav])
 
   const handleBack = () => {
     if (expandedL4) navigateTo(3)
@@ -1133,7 +1135,7 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
   // ── JSX ──────────────────────────────────────────────────────────────────
 
   return (
-    <div className="network-container">
+    <div className={`network-container${lightMode ? ' light' : ''}`}>
       <div className="network-header">
         <div className="header-left">
           {(expandedL2 || expandedL3 || expandedL4) && (
@@ -1210,6 +1212,29 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
             </button>
           )}
         </div>
+
+        <div className="network-header-switches">
+          {onSwitchView && (
+            <>
+              <button className="nav-btn" onClick={() => onSwitchView('list')} title="List view">
+                <List className="w-4 h-4" />
+              </button>
+              <button className="nav-btn" onClick={() => onSwitchView('split')} title="Split view">
+                <Columns2 className="w-4 h-4" />
+              </button>
+              <button className="nav-btn" onClick={() => onSwitchView('stats')} title="Stats">
+                <BarChart3 className="w-4 h-4" />
+              </button>
+            </>
+          )}
+          <button
+            className="nav-btn"
+            onClick={onToggleTheme}
+            title={lightMode ? 'Switch to dark mode' : 'Switch to light mode'}
+          >
+            {lightMode ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+          </button>
+        </div>
       </div>
 
       <div className="network-canvas-wrap">
@@ -1221,16 +1246,6 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
         {expandedL2 && !expandedL3 && 'TAP SUBCATEGORY TO EXPAND \u00b7 TAP LAW FOR DETAILS'}
         {expandedL3 && 'TAP TO DRILL DEEPER \u00b7 DRAG TO PAN'}
       </div>
-
-      {/* Report / Feedback button — bottom left */}
-      <button
-        className="feedback-btn"
-        title="Send feedback or suggestions"
-        onClick={() => { setFeedbackContext(''); setShowFeedback(true); setFeedbackSent(false) }}
-      >
-        <Mail className="w-4 h-4" />
-        <span>Feedback</span>
-      </button>
 
       {/* Observance Legend */}
       <div className="observance-legend-container">
@@ -1252,441 +1267,10 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
         )}
       </div>
 
-      {onSwitchView && (
-        <div className="network-view-switches">
-          <button className="legend-view-btn" onClick={() => onSwitchView('list')}>
-            <List className="w-3.5 h-3.5" /> List
-          </button>
-          <button className="legend-view-btn" onClick={() => onSwitchView('stats')}>
-            <BarChart3 className="w-3.5 h-3.5" /> Stats
-          </button>
-        </div>
-      )}
 
-      {/* Side Panel */}
-      <div className={`side-panel ${selectedLaw ? 'open' : ''}`}>
-        {selectedLaw && (
-          <>
-            <div className="side-panel-header">
-              <div className="side-panel-title-area">
-                <h2 className="side-panel-title">{selectedLaw.reference}</h2>
-                {selectedLaw.has_forever_language && (
-                  <Sparkles className="w-5 h-5 side-panel-eternal-icon" />
-                )}
-              </div>
-              <button onClick={onCloseLaw} className="side-panel-close">
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Tabs */}
-            <div className="side-panel-tabs">
-              <button
-                className={`side-panel-tab ${sideTab === 'study' ? 'active' : ''}`}
-                onClick={() => setSideTab('study')}
-              >
-                <BookOpen className="w-4 h-4" />
-                Study
-              </button>
-              <button
-                className={`side-panel-tab ${sideTab === 'details' ? 'active' : ''}`}
-                onClick={() => setSideTab('details')}
-              >
-                <Info className="w-4 h-4" />
-                Details
-              </button>
-            </div>
-
-            <div className="side-panel-body">
-
-              {/* ── Study Tab ── */}
-              {sideTab === 'study' && (
-                <>
-                  <section className="side-panel-section">
-                    <h3 className="side-panel-label">Verse Text</h3>
-                    <blockquote className="side-panel-verse">{selectedLaw.verse_text}</blockquote>
-                  </section>
-
-                  <section className="side-panel-section">
-                    <h3 className="side-panel-label">Law Summary</h3>
-                    <p className="side-panel-text">{selectedLaw.law_summary}</p>
-                  </section>
-
-                  {(selectedLaw.has_forever_language || selectedLaw.has_generational_language) && (
-                    <section className="side-panel-section side-panel-eternal">
-                      <h3 className="side-panel-label">
-                        <Sparkles className="w-3.5 h-3.5" style={{ display: 'inline', marginRight: '5px' }} />
-                        Eternal Language
-                      </h3>
-                      {selectedLaw.has_forever_language && selectedLaw.forever_phrase && (
-                        <p className="side-panel-text side-panel-phrase">"{selectedLaw.forever_phrase}"</p>
-                      )}
-                      {selectedLaw.has_generational_language && selectedLaw.generational_phrase && (
-                        <p className="side-panel-text side-panel-phrase">"{selectedLaw.generational_phrase}"</p>
-                      )}
-                    </section>
-                  )}
-
-                  {selectedLaw.cross_references?.length > 0 && (
-                    <section className="side-panel-section">
-                      <h3 className="side-panel-label">
-                        <BookOpen className="w-3.5 h-3.5" style={{ display: 'inline', marginRight: '5px' }} />
-                        Cross References
-                      </h3>
-                      <div className="side-panel-refs">
-                        {selectedLaw.cross_references.map((ref, i) => (
-                          <button key={i} className="verse-ref-btn" onClick={() => fetchVerse(ref)}>
-                            {ref}
-                          </button>
-                        ))}
-                      </div>
-                    </section>
-                  )}
-
-                  {selectedLaw.other_torah_refs && (
-                    <section className="side-panel-section">
-                      <h3 className="side-panel-label">
-                        <BookOpen className="w-3.5 h-3.5" style={{ display: 'inline', marginRight: '5px' }} />
-                        Related Verses
-                      </h3>
-                      <div className="side-panel-refs">
-                        {(Array.isArray(selectedLaw.other_torah_refs)
-                          ? selectedLaw.other_torah_refs
-                          : selectedLaw.other_torah_refs.split(/,\s*(?=[A-Z0-9])/)
-                        ).map((ref, i) => {
-                          const clean = (ref || '').trim()
-                          if (!clean) return null
-                          return (
-                            <button key={i} className="verse-ref-btn" onClick={() => fetchVerse(clean)}>
-                              {clean}
-                            </button>
-                          )
-                        })}
-                      </div>
-                    </section>
-                  )}
-
-                  {/* Fetched verse display */}
-                  {fetchedVerse && (
-                    <section className="side-panel-section side-panel-fetched-verse">
-                      <div className="fetched-verse-header">
-                        <h3 className="side-panel-label">
-                          <BookOpen className="w-3.5 h-3.5" style={{ display: 'inline', marginRight: '5px' }} />
-                          {fetchedVerse.reference}
-                        </h3>
-                        <button className="fetched-verse-close" onClick={() => setFetchedVerse(null)}>
-                          <X className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                      {fetchedVerse.loading && (
-                        <p className="side-panel-text fetched-verse-loading">Loading verse...</p>
-                      )}
-                      {fetchedVerse.error && (
-                        <p className="side-panel-text fetched-verse-error">{fetchedVerse.error}</p>
-                      )}
-                      {fetchedVerse.text && (
-                        <>
-                          <blockquote className="side-panel-verse">{fetchedVerse.text}</blockquote>
-                          <div className="keyword-tags">
-                            {extractKeywords(fetchedVerse.text).map((kw, i) => (
-                              <button key={i} className="keyword-tag" onClick={() => searchKeyword(kw)}>
-                                {kw}
-                              </button>
-                            ))}
-                          </div>
-                        </>
-                      )}
-                    </section>
-                  )}
-
-                  {/* Keywords from verse text */}
-                  {!fetchedVerse && selectedLaw.verse_text && (
-                    <section className="side-panel-section">
-                      <h3 className="side-panel-label">
-                        <Search className="w-3.5 h-3.5" style={{ display: 'inline', marginRight: '5px' }} />
-                        Search by Keyword
-                      </h3>
-                      <div className="keyword-tags">
-                        {extractKeywords(selectedLaw.verse_text).map((kw, i) => (
-                          <button key={i} className="keyword-tag" onClick={() => searchKeyword(kw)}>
-                            {kw}
-                          </button>
-                        ))}
-                      </div>
-                    </section>
-                  )}
-
-                  {/* Keyword search results */}
-                  {keywordResults && (
-                    <section className="side-panel-section side-panel-keyword-results">
-                      <div className="fetched-verse-header">
-                        <h3 className="side-panel-label">
-                          <Search className="w-3.5 h-3.5" style={{ display: 'inline', marginRight: '5px' }} />
-                          "{keywordResults.keyword}" in Scripture
-                        </h3>
-                        <button className="fetched-verse-close" onClick={() => setKeywordResults(null)}>
-                          <X className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                      {keywordResults.loading && (
-                        <p className="side-panel-text fetched-verse-loading">Searching...</p>
-                      )}
-                      {keywordResults.error && (
-                        <p className="side-panel-text fetched-verse-error">{keywordResults.error}</p>
-                      )}
-                      {keywordResults.results.length > 0 && (
-                        <div className="keyword-results-list">
-                          {keywordResults.results.map((r, i) => (
-                            <div key={i} className="keyword-result-item">
-                              <button
-                                className="keyword-result-ref"
-                                onClick={() => fetchVerse(r.reference)}
-                              >
-                                {r.reference}
-                              </button>
-                              <p
-                                className="keyword-result-text"
-                                dangerouslySetInnerHTML={{ __html: r.highlighted }}
-                              />
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                      {!keywordResults.loading && keywordResults.results.length === 0 && !keywordResults.error && (
-                        <p className="side-panel-text fetched-verse-loading">No results found</p>
-                      )}
-                    </section>
-                  )}
-                </>
-              )}
-
-              {/* ── Details Tab ── */}
-              {sideTab === 'details' && (
-                <>
-                  <section className="side-panel-section side-panel-grid">
-                    <h3 className="side-panel-label">Classification</h3>
-                    <div className="side-panel-field">
-                      <span className="side-panel-field-label">Duration</span>
-                      <span className="side-panel-field-value">{selectedLaw.duration_type?.replace(/_/g, ' ') || 'Not analyzed'}</span>
-                    </div>
-                    <div className="side-panel-field">
-                      <span className="side-panel-field-label">Applicability</span>
-                      <span className="side-panel-field-value">{selectedLaw.current_applicability?.replace(/_/g, ' ') || 'Not analyzed'}</span>
-                    </div>
-                    <div className="side-panel-field">
-                      <span className="side-panel-field-label">Regulated Party</span>
-                      <span className="side-panel-field-value">{selectedLaw.regulated_party || 'Not specified'}</span>
-                    </div>
-                    {selectedLaw.observance_class && (
-                      <div className="side-panel-field">
-                        <span className="side-panel-field-label">Observance</span>
-                        <span className="side-panel-field-value side-panel-observance">
-                          <span style={{ color: OBSERVANCE_CONFIG[selectedLaw.observance_class]?.color }}>
-                            {OBSERVANCE_CONFIG[selectedLaw.observance_class]?.symbol}
-                          </span>
-                          {' '}{OBSERVANCE_CONFIG[selectedLaw.observance_class]?.label || selectedLaw.observance_class.replace(/_/g, ' ')}
-                        </span>
-                      </div>
-                    )}
-                    {selectedLaw.categories?.length > 0 && (
-                      <div className="side-panel-field">
-                        <span className="side-panel-field-label">Category</span>
-                        <span className="side-panel-field-value">
-                          {selectedLaw.categories.map(c => c.split(' > ').slice(1).join(' > ')).join('; ')}
-                        </span>
-                      </div>
-                    )}
-                  </section>
-
-                  {(selectedLaw.requires_temple || selectedLaw.requires_priesthood || selectedLaw.requires_land_israel) && (
-                    <section className="side-panel-section">
-                      <h3 className="side-panel-label">
-                        <Clock className="w-3.5 h-3.5" style={{ display: 'inline', marginRight: '5px' }} />
-                        Prerequisites
-                      </h3>
-                      {selectedLaw.requires_temple && selectedLaw.requires_temple !== 'no' && (
-                        <p className="side-panel-prereq">Temple: {selectedLaw.requires_temple}</p>
-                      )}
-                      {selectedLaw.requires_priesthood && selectedLaw.requires_priesthood !== 'no' && (
-                        <p className="side-panel-prereq">Priesthood: {selectedLaw.requires_priesthood}</p>
-                      )}
-                      {selectedLaw.requires_land_israel && selectedLaw.requires_land_israel !== 'no' && (
-                        <p className="side-panel-prereq">Land of Israel: {selectedLaw.requires_land_israel}</p>
-                      )}
-                    </section>
-                  )}
-
-                  {selectedLaw.classification_reasoning && (
-                    <section className="side-panel-section">
-                      <h3 className="side-panel-label">Reasoning</h3>
-                      <p className="side-panel-text">{selectedLaw.classification_reasoning}</p>
-                    </section>
-                  )}
-
-                  {selectedLaw.notes && (
-                    <section className="side-panel-section">
-                      <h3 className="side-panel-label">
-                        <MessageSquare className="w-3.5 h-3.5" style={{ display: 'inline', marginRight: '5px' }} />
-                        Notes
-                      </h3>
-                      <p className="side-panel-text">{selectedLaw.notes}</p>
-                    </section>
-                  )}
-
-                  <button
-                    className="side-panel-report-btn"
-                    onClick={() => {
-                      setFeedbackContext(`${selectedLaw.reference} — ${selectedLaw.law_summary}`)
-                      setFeedbackSent(false)
-                      setShowFeedback(true)
-                    }}
-                  >
-                    <Mail className="w-4 h-4" />
-                    Report Issue or Suggest Correction
-                  </button>
-                </>
-              )}
-            </div>
-          </>
-        )}
-      </div>
-
-      {/* Feedback Dialog */}
-      {showFeedback && (
-        <div className="feedback-overlay" onClick={(e) => { if (e.target === e.currentTarget) setShowFeedback(false) }}>
-          <div className="feedback-dialog">
-            <div className="feedback-dialog-header">
-              <h3 className="feedback-dialog-title">
-                <Mail className="w-4 h-4" />
-                {feedbackContext ? 'Report Issue' : 'Send Feedback'}
-              </h3>
-              <button className="feedback-dialog-close" onClick={() => setShowFeedback(false)}>
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            {feedbackSent ? (
-              <div className="feedback-dialog-body">
-                <div className="feedback-sent">
-                  <Sparkles className="w-6 h-6" />
-                  <p>Thank you for your feedback!</p>
-                  <p className="feedback-sent-sub">Your message has been sent.</p>
-                  <button className="feedback-submit-btn" onClick={() => setShowFeedback(false)}>
-                    Close
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="feedback-dialog-body">
-                {feedbackContext && (
-                  <div className="feedback-context">
-                    <span className="feedback-context-label">Regarding:</span>
-                    <span className="feedback-context-value">{feedbackContext}</span>
-                  </div>
-                )}
-
-                <label className="feedback-label">
-                  Name
-                  <input
-                    type="text"
-                    className="feedback-field"
-                    placeholder="Your name"
-                    value={feedbackName}
-                    onChange={(e) => setFeedbackName(e.target.value)}
-                  />
-                </label>
-
-                <label className="feedback-label">
-                  Email <span className="feedback-optional">(optional)</span>
-                  <input
-                    type="email"
-                    className="feedback-field"
-                    placeholder="your@email.com"
-                    value={feedbackEmail}
-                    onChange={(e) => setFeedbackEmail(e.target.value)}
-                  />
-                </label>
-
-                <label className="feedback-label">
-                  Message
-                  <textarea
-                    className="feedback-field feedback-textarea"
-                    placeholder="Share your feedback, report an issue, or suggest a correction..."
-                    rows={5}
-                    value={feedbackMessage}
-                    onChange={(e) => setFeedbackMessage(e.target.value)}
-                  />
-                </label>
-
-                {feedbackError && (
-                  <div className="feedback-error">{feedbackError}</div>
-                )}
-
-                <button
-                  className="feedback-submit-btn"
-                  disabled={!feedbackMessage.trim() || feedbackSending}
-                  onClick={async () => {
-                    setFeedbackSending(true)
-                    setFeedbackError('')
-                    try {
-                      const res = await fetch(FEEDBACK_API, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                          name: feedbackName,
-                          email: feedbackEmail,
-                          message: feedbackMessage,
-                          context: feedbackContext,
-                        }),
-                      })
-                      if (!res.ok) throw new Error('Failed to send')
-                      setFeedbackSent(true)
-                      setFeedbackName('')
-                      setFeedbackEmail('')
-                      setFeedbackMessage('')
-                    } catch {
-                      setFeedbackError('Failed to send. Please try again.')
-                    } finally {
-                      setFeedbackSending(false)
-                    }
-                  }}
-                >
-                  <Send className="w-4 h-4" />
-                  {feedbackSending ? 'Sending...' : 'Send Feedback'}
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+      <LawSidePanel selectedLaw={selectedLaw} onCloseLaw={onCloseLaw} />
     </div>
   )
-}
-
-// ── Tree utility functions ─────────────────────────────────────────────────
-
-function countAllLaws(node) {
-  if (!node) return 0
-  let count = (node._laws || []).length
-  Object.values(node._children || {}).forEach(child => {
-    count += countAllLaws(child)
-  })
-  return count
-}
-
-function collectAllLaws(node) {
-  if (!node) return []
-  const laws = [...(node._laws || [])]
-  Object.values(node._children || {}).forEach(child => {
-    laws.push(...collectAllLaws(child))
-  })
-  // Deduplicate by law id
-  const seen = new Set()
-  return laws.filter(law => {
-    if (seen.has(law.id)) return false
-    seen.add(law.id)
-    return true
-  })
 }
 
 export default NetworkGraphStyled
