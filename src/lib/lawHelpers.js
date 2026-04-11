@@ -90,9 +90,13 @@ export function extractKeywords(text, maxCount = 12) {
 }
 
 export function getShortTitle(law, maxLen = 50) {
-  let title = law.law_summary || law.reference
-  title = title.replace(/^(The law that|Law that|Command to|Requirement to|Prohibition against|You shall|You must|Do not)\s+/i, '')
-  title = title.charAt(0).toUpperCase() + title.slice(1)
+  // Use preview field if available, otherwise fall back to law_summary
+  let title = law.preview || law.law_summary || law.reference
+  // Preview is already cleaned, so no need for regex stripping
+  if (!law.preview) {
+    title = title.replace(/^(The law that|Law that|Command to|Requirement to|Prohibition against|You shall|You must|Do not)\s+/i, '')
+    title = title.charAt(0).toUpperCase() + title.slice(1)
+  }
   if (title.length > maxLen) title = title.substring(0, maxLen) + '...'
   return title
 }
