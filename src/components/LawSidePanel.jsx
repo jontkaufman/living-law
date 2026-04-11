@@ -144,12 +144,12 @@ function LawSidePanel({ selectedLaw, onCloseLaw }) {
                   )}
 
                   {selectedLaw.cross_references?.length > 0 && (
-                    <section className="side-panel-section">
+                    <section className="side-panel-section" data-tour="panel-references">
                       <h3 className="side-panel-label">
                         <BookOpen className="w-3.5 h-3.5" style={{ display: 'inline', marginRight: '5px' }} />
                         Cross References
                       </h3>
-                      <div className="side-panel-refs" data-tour="panel-references">
+                      <div className="side-panel-refs">
                         {selectedLaw.cross_references.map((ref, i) => (
                           <button key={i} className="verse-ref-btn" onClick={() => fetchVerse(ref)}>
                             {ref}
@@ -160,12 +160,12 @@ function LawSidePanel({ selectedLaw, onCloseLaw }) {
                   )}
 
                   {selectedLaw.other_torah_refs && (
-                    <section className="side-panel-section">
+                    <section className="side-panel-section" data-tour="panel-references">
                       <h3 className="side-panel-label">
                         <BookOpen className="w-3.5 h-3.5" style={{ display: 'inline', marginRight: '5px' }} />
                         Related Verses
                       </h3>
-                      <div className="side-panel-refs" data-tour="panel-references">
+                      <div className="side-panel-refs">
                         {(Array.isArray(selectedLaw.other_torah_refs)
                           ? selectedLaw.other_torah_refs
                           : selectedLaw.other_torah_refs.split(/,\s*(?=[A-Z0-9])/)
