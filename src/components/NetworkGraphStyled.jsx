@@ -1252,7 +1252,7 @@ function NetworkGraphStyled({ laws, categoryMeta = {}, onSelectLaw, selectedLaw,
           )}
         </div>
 
-        <div className="network-header-switches" data-tour="view-switchers">
+        <div className="network-header-right" data-tour="view-switchers">
           {onSwitchView && (
             <>
               <button className="nav-btn active" title="Network view (active)">
@@ -1281,7 +1281,7 @@ function NetworkGraphStyled({ laws, categoryMeta = {}, onSelectLaw, selectedLaw,
             onClick={onRestartTour}
             title="Restart Tour"
           >
-            <HelpCircle size={20} />
+            <HelpCircle className="w-4 h-4" />
           </button>
         </div>
       </div>
