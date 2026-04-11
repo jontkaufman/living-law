@@ -741,13 +741,17 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
         : 11
 
       ctx.font = `${fontSize}px 'Inter', 'Segoe UI', system-ui, sans-serif`
-      ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${labelAlpha})`
+      ctx.fillStyle = lightModeRef.current
+        ? `rgba(0, 0, 0, ${labelAlpha})`
+        : `rgba(${r}, ${g}, ${b}, ${labelAlpha})`
       const labelY = pos.y + node.coreRadius * scale + 12
       ctx.fillText(node.label, pos.x, labelY)
 
       if (node.sublabel) {
         ctx.font = `${fontSize - 2}px 'Inter', 'Segoe UI', system-ui, sans-serif`
-        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${labelAlpha * 0.65})`
+        ctx.fillStyle = lightModeRef.current
+          ? `rgba(0, 0, 0, ${labelAlpha * 0.65})`
+          : `rgba(${r}, ${g}, ${b}, ${labelAlpha * 0.65})`
         ctx.fillText(node.sublabel, pos.x, labelY + fontSize + 3)
       }
     })
@@ -776,13 +780,15 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
 
       ctx.textAlign = 'left'
       ctx.font = `600 20px 'Inter', 'Segoe UI', system-ui, sans-serif`
-      ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`
+      ctx.fillStyle = lightModeRef.current
+        ? `rgba(0, 0, 0, ${alpha})`
+        : `rgba(${r}, ${g}, ${b}, ${alpha})`
       ctx.fillText(node.refLabel || '', node.x + 14, node.y)
 
       const refWidth = node.refLabel ? ctx.measureText(node.refLabel).width + 14 : 0
       ctx.font = `18px 'Inter', 'Segoe UI', system-ui, sans-serif`
       ctx.fillStyle = lightModeRef.current
-        ? `rgba(60, 50, 30, ${alpha * 0.8})`
+        ? `rgba(0, 0, 0, ${alpha * 0.8})`
         : `rgba(235, 225, 205, ${alpha * 0.8})`
       ctx.fillText(node.label, node.x + 14 + refWidth, node.y)
 
