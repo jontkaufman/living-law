@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react'
-import { ChevronLeft, Sparkles, Search, X, Network, List, Columns2, BarChart3, Sun, Moon } from 'lucide-react'
+import { ChevronLeft, Sparkles, Search, X, Network, List, Columns2, BarChart3, Sun, Moon, HelpCircle } from 'lucide-react'
 import LawSidePanel from './LawSidePanel'
 import {
   LEVEL2_CONFIG, OBSERVANCE_CONFIG,
@@ -78,7 +78,7 @@ function drawStar(ctx, x, y, rgb, coreRadius, glowRadius, intensity = 1.0) {
 
 // ── Component ────────────────────────────────────────────────────────────────
 
-function NetworkGraphStyled({ laws, categoryMeta = {}, onSelectLaw, selectedLaw, onCloseLaw, onSwitchView, navState, onNavChange, lightMode, onToggleTheme }) {
+function NetworkGraphStyled({ laws, categoryMeta = {}, onSelectLaw, selectedLaw, onCloseLaw, onSwitchView, navState, onNavChange, lightMode, onToggleTheme, onRestartTour }) {
   const canvasRef = useRef(null)
   const animFrameRef = useRef(null)
   const lightModeRef = useRef(false)
@@ -1252,7 +1252,7 @@ function NetworkGraphStyled({ laws, categoryMeta = {}, onSelectLaw, selectedLaw,
           )}
         </div>
 
-        <div className="network-header-switches">
+        <div className="network-header-switches" data-tour="view-switchers">
           {onSwitchView && (
             <>
               <button className="nav-btn active" title="Network view (active)">
@@ -1276,11 +1276,18 @@ function NetworkGraphStyled({ laws, categoryMeta = {}, onSelectLaw, selectedLaw,
           >
             {lightMode ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
           </button>
+          <button
+            className="nav-btn"
+            onClick={onRestartTour}
+            title="Restart Tour"
+          >
+            <HelpCircle size={20} />
+          </button>
         </div>
       </div>
 
       <div className="network-canvas-wrap">
-        <canvas ref={canvasRef} className="network-canvas" />
+        <canvas ref={canvasRef} className="network-canvas" data-tour="network-canvas" />
       </div>
 
       <div className="network-hint">
