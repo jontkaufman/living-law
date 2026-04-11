@@ -4,11 +4,11 @@ import LawSidePanel from './LawSidePanel'
 import {
   LEVEL2_CONFIG, OBSERVANCE_CONFIG, FEEDBACK_API,
   buildHierarchyTree, countAllLaws, collectAllLaws,
-  formatLabel, getShortTitle,
+  formatLabel, getShortTitle, getSortedChildren,
 } from '../lib/lawHelpers'
 import './LawList.css'
 
-function LawList({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwitchView, hideSidePanel, navState, onNavChange, lightMode, onToggleTheme }) {
+function LawList({ laws, categoryMeta = {}, onSelectLaw, selectedLaw, onCloseLaw, onSwitchView, hideSidePanel, navState, onNavChange, lightMode, onToggleTheme }) {
   // Internal accordion state — used when not controlled by parent (standalone mode)
   const [_expandedRoot, _setExpandedRoot] = useState(null)
   const [_expandedL2, _setExpandedL2] = useState(null)
@@ -197,7 +197,7 @@ function LawList({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwitchView, hid
             {getShortTitle(law, 80)}
           </span>
           {obsConfig && (
-            <span className="accordion-law-obs" style={{ color: obsConfig.color }}>
+            <span className="accordion-law-obs" style={{ color: lightMode && obsConfig.lightColor ? obsConfig.lightColor : obsConfig.color }}>
               {obsConfig.symbol}
             </span>
           )}
@@ -208,14 +208,13 @@ function LawList({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwitchView, hid
 
   // Render L4 categories + their laws
   const renderL4 = (l3Data, parentColor) => {
-    const l4Keys = Object.keys(l3Data._children)
-    if (l4Keys.length === 0) {
+    const l4Sorted = getSortedChildren(l3Data._children, categoryMeta)
+    if (l4Sorted.length === 0) {
       const allLaws = collectAllLaws(l3Data)
       return <div className="accordion-laws">{renderLaws(allLaws, parentColor)}</div>
     }
 
-    return l4Keys.map(l4Key => {
-      const l4Data = l3Data._children[l4Key]
+    return l4Sorted.map(([l4Key, l4Data]) => {
       const lawCount = countAllLaws(l4Data)
       const isOpen = expandedL4 === l4Key
       const [r, g, b] = parentColor
@@ -245,14 +244,13 @@ function LawList({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwitchView, hid
 
   // Render L3 categories
   const renderL3 = (l2Data, parentColor) => {
-    const l3Keys = Object.keys(l2Data._children)
-    if (l3Keys.length === 0) {
+    const l3Sorted = getSortedChildren(l2Data._children, categoryMeta)
+    if (l3Sorted.length === 0) {
       const allLaws = collectAllLaws(l2Data)
       return <div className="accordion-laws">{renderLaws(allLaws, parentColor)}</div>
     }
 
-    return l3Keys.map(l3Key => {
-      const l3Data = l2Data._children[l3Key]
+    return l3Sorted.map(([l3Key, l3Data]) => {
       const lawCount = countAllLaws(l3Data)
       const isOpen = expandedL3 === l3Key
       const [r, g, b] = parentColor
@@ -387,7 +385,7 @@ function LawList({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwitchView, hid
           const rootCount = countAllLaws(root.node)
           const isRootOpen = expandedRoot === root.key
           const [r, g, b] = root.color
-          const l2Keys = Object.keys(root.node._children)
+          const l2Sorted = getSortedChildren(root.node._children, categoryMeta)
 
           return (
             <div key={root.key} className="accordion-root">
@@ -406,14 +404,7 @@ function LawList({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwitchView, hid
 
               {isRootOpen && (
                 <div className="accordion-root-content">
-                  {l2Keys.sort((a, b) => {
-                    const configA = LEVEL2_CONFIG[a]
-                    const configB = LEVEL2_CONFIG[b]
-                    const numA = configA?.short ? parseInt(configA.short) : Infinity
-                    const numB = configB?.short ? parseInt(configB.short) : Infinity
-                    return numA - numB
-                  }).map(l2Key => {
-                    const l2Data = root.node._children[l2Key]
+                  {l2Sorted.map(([l2Key, l2Data]) => {
                     const l2Count = countAllLaws(l2Data)
                     const config = LEVEL2_CONFIG[l2Key] || { label: formatLabel(l2Key), short: '', color: [148, 163, 184] }
                     const isL2Open = expandedL2 === l2Key
@@ -541,7 +532,7 @@ function LawList({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwitchView, hid
           <div className="observance-legend">
             {Object.entries(OBSERVANCE_CONFIG).map(([key, cfg]) => (
               <div key={key} className="observance-legend-item">
-                <span className="observance-legend-symbol" style={{ color: cfg.color }}>{cfg.symbol}</span>
+                <span className="observance-legend-symbol" style={{ color: lightMode && cfg.lightColor ? cfg.lightColor : cfg.color }}>{cfg.symbol}</span>
                 <span className="observance-legend-label">{cfg.label}</span>
               </div>
             ))}

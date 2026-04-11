@@ -22,13 +22,13 @@ export const LEVEL2_CONFIG = {
 // ── Observance classification config ────────────────────────────────────────
 
 export const OBSERVANCE_CONFIG = {
-  already_observing:       { label: 'Christians Already Do',       symbol: '\u2714', color: '#6bcf7f' },
-  should_observe:          { label: 'Should Observe',              symbol: '\u2605', color: '#e0c060' },
-  situational:             { label: 'Situational',                 symbol: '\u25C7', color: '#8ca0b4' },
-  observe_in_principle:    { label: 'Observe in Principle',        symbol: '\u25CB', color: '#c8a878' },
-  cannot_currently_observe:{ label: 'Cannot Currently Observe',    symbol: '\u29B8', color: '#c08888' },
-  aware_in_principle:      { label: 'Aware in Principle',          symbol: '\u25B3', color: '#9a9a9a' },
-  voluntary:               { label: 'Voluntary',                   symbol: '\u2661', color: '#b090d0' },
+  already_observing:       { label: 'Christians Already Do',       symbol: '\u2714', color: '#6bcf7f', lightColor: '#2d8f45' },
+  should_observe:          { label: 'Should Observe',              symbol: '\u2605', color: '#e0c060', lightColor: '#a68a20' },
+  situational:             { label: 'Situational',                 symbol: '\u25C7', color: '#8ca0b4', lightColor: '#4a6070' },
+  observe_in_principle:    { label: 'Observe in Principle',        symbol: '\u25CB', color: '#c8a878', lightColor: '#856b38' },
+  cannot_currently_observe:{ label: 'Cannot Currently Observe',    symbol: '\u29B8', color: '#c08888', lightColor: '#a05050' },
+  aware_in_principle:      { label: 'Aware in Principle',          symbol: '\u25B3', color: '#9a9a9a', lightColor: '#4a4a4a' },
+  voluntary:               { label: 'Voluntary',                   symbol: '\u2661', color: '#b090d0', lightColor: '#7050a0' },
 }
 
 // ── Bible book number → name (bolls.life uses numeric book IDs) ──────────────
@@ -144,5 +144,19 @@ export function collectAllLaws(node) {
     if (seen.has(law.id)) return false
     seen.add(law.id)
     return true
+  })
+}
+
+// ── Sort category children by sort_order ────────────────────────────────────
+
+export function getSortedChildren(childrenObj, categoryMeta) {
+  if (!childrenObj) return []
+  const entries = Object.entries(childrenObj)
+  return entries.sort((a, b) => {
+    const [keyA] = a
+    const [keyB] = b
+    const orderA = categoryMeta[keyA]?.sort_order ?? 999
+    const orderB = categoryMeta[keyB]?.sort_order ?? 999
+    return orderA - orderB
   })
 }

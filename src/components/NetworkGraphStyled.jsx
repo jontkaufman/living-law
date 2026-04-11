@@ -4,7 +4,7 @@ import LawSidePanel from './LawSidePanel'
 import {
   LEVEL2_CONFIG, OBSERVANCE_CONFIG,
   buildHierarchyTree, countAllLaws, collectAllLaws,
-  formatLabel, getShortTitle,
+  formatLabel, getShortTitle, getSortedChildren,
 } from '../lib/lawHelpers'
 import './NetworkGraphStyled.css'
 
@@ -78,7 +78,7 @@ function drawStar(ctx, x, y, rgb, coreRadius, glowRadius, intensity = 1.0) {
 
 // ── Component ────────────────────────────────────────────────────────────────
 
-function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwitchView, navState, onNavChange, lightMode, onToggleTheme }) {
+function NetworkGraphStyled({ laws, categoryMeta = {}, onSelectLaw, selectedLaw, onCloseLaw, onSwitchView, navState, onNavChange, lightMode, onToggleTheme }) {
   const canvasRef = useRef(null)
   const animFrameRef = useRef(null)
   const lightModeRef = useRef(false)
@@ -169,8 +169,8 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
     targetPanRef.current = { x: w / 2 - cx * zoom, y: h / 2 - cy * zoom }
   }, [])
 
-  const focusOnFullTree = useCallback(() => {
-    focusOnArea(0, ROOT_Y - 60, 2400, LEVEL2_Y + 100)
+  const focusOnCommandments = useCallback(() => {
+    focusOnArea(200, LEVEL2_Y - 80, 2400, LEVEL2_Y + 180)
   }, [focusOnArea])
 
   // ── Navigate to a specific law from search ────────────────────────────────
@@ -241,13 +241,13 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
     const neighborL2s = []
 
     if (hierarchy['love-god']) {
-      Object.keys(hierarchy['love-god']._children).forEach(key => {
-        godL2s.push({ root: 'love-god', key, ...hierarchy['love-god']._children[key] })
+      getSortedChildren(hierarchy['love-god']._children, categoryMeta).forEach(([key, node]) => {
+        godL2s.push({ root: 'love-god', key, ...node })
       })
     }
     if (hierarchy['love-neighbor']) {
-      Object.keys(hierarchy['love-neighbor']._children).forEach(key => {
-        neighborL2s.push({ root: 'love-neighbor', key, ...hierarchy['love-neighbor']._children[key] })
+      getSortedChildren(hierarchy['love-neighbor']._children, categoryMeta).forEach(([key, node]) => {
+        neighborL2s.push({ root: 'love-neighbor', key, ...node })
       })
     }
 
@@ -360,19 +360,18 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
       const l2Node = hierarchy[rootKey]?._children[expandedL2]
       if (!l2Node) { nodesRef.current = nodes; edgesRef.current = edges; return }
 
-      const l3Keys = Object.keys(l2Node._children)
+      const l3Sorted = getSortedChildren(l2Node._children, categoryMeta)
       const directLaws = l2Node._laws || []
       const parentConfig = LEVEL2_CONFIG[expandedL2] || { color: [148, 163, 184] }
 
-      if (l3Keys.length === 0 && directLaws.length > 0) {
+      if (l3Sorted.length === 0 && directLaws.length > 0) {
         addLawListNodes(`l2-${expandedL2}`, l2Pos.x, LEVEL3_Y, directLaws, parentConfig.color)
       } else {
-        const l3Spacing = Math.max(115, 185 - l3Keys.length * 4)
-        const l3Positions = positionChildren(l3Keys.length, l2Pos.x, LEVEL3_Y, l3Spacing)
+        const l3Spacing = Math.max(115, 185 - l3Sorted.length * 4)
+        const l3Positions = positionChildren(l3Sorted.length, l2Pos.x, LEVEL3_Y, l3Spacing)
         const l3PositionMap = {}
 
-        l3Keys.forEach((l3Key, i) => {
-          const l3Data = l2Node._children[l3Key]
+        l3Sorted.forEach(([l3Key, l3Data], i) => {
           const l3LawCount = countAllLaws(l3Data)
           const isExpanded = expandedL3 === l3Key
           const nodeId = `l3-${l3Key}`
@@ -393,18 +392,17 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
           const l3Pos = l3PositionMap[expandedL3]
           if (l3Pos) {
             const l3Data = l2Node._children[expandedL3]
-            const l4Keys = Object.keys(l3Data._children)
+            const l4Sorted = getSortedChildren(l3Data._children, categoryMeta)
 
-            if (l4Keys.length === 0) {
+            if (l4Sorted.length === 0) {
               const allLaws = collectAllLaws(l3Data)
               addLawListNodes(`l3-${expandedL3}`, l3Pos.x, LEVEL4_Y, allLaws, parentConfig.color)
             } else {
-              const l4Spacing = Math.max(105, 175 - l4Keys.length * 4)
-              const l4Positions = positionChildren(l4Keys.length, l3Pos.x, LEVEL4_Y, l4Spacing)
+              const l4Spacing = Math.max(105, 175 - l4Sorted.length * 4)
+              const l4Positions = positionChildren(l4Sorted.length, l3Pos.x, LEVEL4_Y, l4Spacing)
               const l4PositionMap = {}
 
-              l4Keys.forEach((l4Key, i) => {
-                const l4Data = l3Data._children[l4Key]
+              l4Sorted.forEach(([l4Key, l4Data], i) => {
                 const l4LawCount = countAllLaws(l4Data)
                 const isExpanded = expandedL4 === l4Key
                 const nodeId = `l4-${l4Key}`
@@ -501,7 +499,7 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
     // Focus camera on the newly expanded area after tree rebuilds
     setTimeout(() => {
       if (!navState.expandedL2) {
-        focusOnFullTree()
+        focusOnCommandments()
         return
       }
 
@@ -519,7 +517,7 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
         focusOnArea(centerX - 350, LEVEL4_Y - 80, centerX + 550, lawY + listHeight + 40)
       } else if (navState.expandedL3 && l2Data) {
         const l3Data = l2Data._children?.[navState.expandedL3]
-        const childCount = l3Data ? Object.keys(l3Data._children).length : 0
+        const childCount = l3Data ? getSortedChildren(l3Data._children, categoryMeta).length : 0
         if (childCount > 0) {
           const halfWidth = Math.max(childCount * 55 + 100, 400)
           focusOnArea(centerX - halfWidth, LEVEL3_Y - 80, centerX + halfWidth, LEVEL4_Y + 80)
@@ -529,7 +527,7 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
           focusOnArea(centerX - 80, LEVEL3_Y - 80, centerX + 550, LEVEL4_Y + listHeight + 40)
         }
       } else if (l2Data) {
-        const childCount = Object.keys(l2Data._children).length
+        const childCount = getSortedChildren(l2Data._children, categoryMeta).length
         if (childCount > 0) {
           const halfWidth = Math.max(childCount * 70 + 100, 400)
           focusOnArea(centerX - halfWidth, LEVEL2_Y - 80, centerX + halfWidth, LEVEL3_Y + 80)
@@ -540,22 +538,50 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
         }
       }
     }, 50)
-  }, [isControlled, navState, hierarchy, focusOnArea, focusOnFullTree])
+  }, [isControlled, navState, hierarchy, focusOnArea, focusOnCommandments])
 
-  // Initial focus
+  // Initial focus — zoom to 10 Commandments level
   useEffect(() => {
     if (laws.length > 0 && !initializedRef.current) {
       initializedRef.current = true
+      // Calculate initial camera position to frame L2 commandments
       const { w, h } = sizeRef.current
-      const zoom = Math.min(w / 2800, h / 550, 1.0)
-      const cx = 1200
-      const cy = 220
-      panRef.current = { x: w / 2 - cx * zoom, y: h / 2 - cy * zoom }
-      targetPanRef.current = { ...panRef.current }
+      // Frame both commandment groups with balanced padding
+      const minX = 200, maxX = 2400
+      const minY = LEVEL2_Y - 80, maxY = LEVEL2_Y + 180
+      const padding = 100
+      const contentW = maxX - minX + padding * 2
+      const contentH = maxY - minY + padding * 2
+      const cx = (minX + maxX) / 2  // Center at 1300
+      const cy = (minY + maxY) / 2  // Center at LEVEL2_Y + 50
+      const zoom = Math.min(w / contentW, h / contentH, 1.2)
+      const panX = w / 2 - cx * zoom
+      const panY = h / 2 - cy * zoom
+      // Set both current and target to avoid lerp from 0,0
+      panRef.current = { x: panX, y: panY }
+      targetPanRef.current = { x: panX, y: panY }
       zoomRef.current = zoom
       targetZoomRef.current = zoom
     }
   }, [laws])
+
+  // Focus on commandments when returning to base view (uncontrolled mode)
+  useEffect(() => {
+    if (!isControlled && laws.length > 0 && !expandedL2 && !expandedL3 && !expandedL4 && initializedRef.current) {
+      // Use a timeout to avoid conflicts with other navigation
+      setTimeout(() => focusOnCommandments(), 50)
+    }
+  }, [isControlled, laws.length, expandedL2, expandedL3, expandedL4, focusOnCommandments])
+
+  // Track previous controlled state to detect mode transitions
+  const prevControlledRef = useRef(isControlled)
+  useEffect(() => {
+    // Detect transition to controlled mode (entering split view)
+    if (isControlled && !prevControlledRef.current && laws.length > 0 && initializedRef.current) {
+      setTimeout(() => focusOnCommandments(), 50)
+    }
+    prevControlledRef.current = isControlled
+  }, [isControlled, laws.length, focusOnCommandments])
 
   // ── Render loop ──────────────────────────────────────────────────────────
 
@@ -797,7 +823,7 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
       if (obsConfig) {
         const titleWidth = ctx.measureText(node.label).width
         ctx.font = `14px 'Inter', 'Segoe UI', system-ui, sans-serif`
-        ctx.fillStyle = obsConfig.color
+        ctx.fillStyle = lightModeRef.current && obsConfig.lightColor ? obsConfig.lightColor : obsConfig.color
         ctx.globalAlpha = alpha * 0.7
         ctx.fillText(obsConfig.symbol, node.x + 14 + refWidth + titleWidth + 12, node.y)
         ctx.globalAlpha = 1.0
@@ -889,7 +915,7 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
         setNav(null, null, null)
         setActivePath(new Set())
         setBreadcrumbs(['Torah Laws'])
-        focusOnFullTree()
+        focusOnCommandments()
       } else {
         setNav(l2Key, null, null)
         const rootId = node.rootId
@@ -898,7 +924,7 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
         setBreadcrumbs(['Torah Laws', rootId === 'love-god' ? 'LOVE YHWH' : 'LOVE NEIGHBOR', config.label])
 
         const l2Data = hierarchy[rootId]?._children[l2Key]
-        const childCount = l2Data ? Object.keys(l2Data._children).length : 0
+        const childCount = l2Data ? getSortedChildren(l2Data._children, categoryMeta).length : 0
         if (childCount > 0) {
           const halfWidth = Math.max(childCount * 70 + 100, 400)
           focusOnArea(node.x - halfWidth, LEVEL2_Y - 80, node.x + halfWidth, LEVEL3_Y + 80)
@@ -925,7 +951,7 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
         setBreadcrumbs(prev => [...prev.slice(0, 3), formatLabel(l3Key)])
 
         const l3Data = node.data
-        const childCount = l3Data ? Object.keys(l3Data._children).length : 0
+        const childCount = l3Data ? getSortedChildren(l3Data._children, categoryMeta).length : 0
         if (childCount > 0) {
           const halfWidth = Math.max(childCount * 55 + 100, 400)
           focusOnArea(node.x - halfWidth, LEVEL3_Y - 80, node.x + halfWidth, LEVEL4_Y + 80)
@@ -963,7 +989,7 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
         hierarchy[r]._children[expandedL2])
       setActivePath(buildActivePath(rootKey, expandedL2, expandedL3, expandedL4, node.data.id))
     }
-  }, [expandedL2, expandedL3, expandedL4, hierarchy, laws, onSelectLaw, focusOnArea, focusOnFullTree, buildActivePath, setNav])
+  }, [expandedL2, expandedL3, expandedL4, hierarchy, laws, onSelectLaw, focusOnArea, focusOnCommandments, buildActivePath, setNav])
 
   // Keep ref in sync so canvas event handlers always call the latest version
   handleNodeClickRef.current = handleNodeClick
@@ -1123,12 +1149,12 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
       setNav(null, null, null)
       setActivePath(new Set())
       setBreadcrumbs(['Torah Laws'])
-      focusOnFullTree()
+      focusOnCommandments()
     } else if (level === 1) {
       setNav(null, null, null)
       setActivePath(new Set())
       setBreadcrumbs(prev => prev.slice(0, 2))
-      focusOnFullTree()
+      focusOnCommandments()
     } else if (level === 2) {
       setNav(expandedL2, null, null)
       const rootKey = Object.keys(hierarchy).find(r => hierarchy[r]._children[expandedL2])
@@ -1140,7 +1166,7 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
       setActivePath(buildActivePath(rootKey, expandedL2, expandedL3))
       setBreadcrumbs(prev => prev.slice(0, 4))
     }
-  }, [expandedL2, expandedL3, hierarchy, focusOnFullTree, buildActivePath, setNav])
+  }, [expandedL2, expandedL3, hierarchy, focusOnCommandments, buildActivePath, setNav])
 
   const handleBack = () => {
     if (expandedL4) navigateTo(3)
@@ -1278,7 +1304,7 @@ function NetworkGraphStyled({ laws, onSelectLaw, selectedLaw, onCloseLaw, onSwit
           <div className="observance-legend">
             {Object.entries(OBSERVANCE_CONFIG).map(([key, cfg]) => (
               <div key={key} className="observance-legend-item">
-                <span className="observance-legend-symbol" style={{ color: cfg.color }}>{cfg.symbol}</span>
+                <span className="observance-legend-symbol" style={{ color: lightMode && cfg.lightColor ? cfg.lightColor : cfg.color }}>{cfg.symbol}</span>
                 <span className="observance-legend-label">{cfg.label}</span>
               </div>
             ))}

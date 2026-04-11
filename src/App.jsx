@@ -6,6 +6,7 @@ import NetworkGraphStyled from './components/NetworkGraphStyled'
 
 function App() {
   const [laws, setLaws] = useState([])
+  const [categoryMeta, setCategoryMeta] = useState({})
   const [selectedLaw, setSelectedLaw] = useState(null)
   const [view, setView] = useState('network') // network, list, split, stats
   const [lightMode, setLightMode] = useState(false)
@@ -19,14 +20,19 @@ function App() {
     expandedL4: null,
   })
 
-  // Load laws data from Supabase
+  // Load laws and category metadata from Supabase
   useEffect(() => {
-    supabase.rpc('get_frontend_laws')
-      .then(({ data, error }) => {
-        if (error) throw error
-        setLaws(data || [])
+    Promise.all([
+      supabase.rpc('get_frontend_laws'),
+      supabase.rpc('get_category_metadata')
+    ])
+      .then(([lawsRes, metaRes]) => {
+        if (lawsRes.error) throw lawsRes.error
+        if (metaRes.error) throw metaRes.error
+        setLaws(lawsRes.data || [])
+        setCategoryMeta(metaRes.data || {})
       })
-      .catch(err => console.error('Error loading laws:', err))
+      .catch(err => console.error('Error loading data:', err))
   }, [])
 
   // ── Network view: full-screen ──
@@ -35,6 +41,7 @@ function App() {
       <div className={`network-fullscreen${lightMode ? ' light' : ''}`}>
         <NetworkGraphStyled
           laws={laws}
+          categoryMeta={categoryMeta}
           onSelectLaw={setSelectedLaw}
           selectedLaw={selectedLaw}
           onCloseLaw={() => setSelectedLaw(null)}
@@ -52,6 +59,7 @@ function App() {
       <div className={`network-fullscreen${lightMode ? ' light' : ''}`}>
         <LawList
           laws={laws}
+          categoryMeta={categoryMeta}
           onSelectLaw={setSelectedLaw}
           selectedLaw={selectedLaw}
           onCloseLaw={() => setSelectedLaw(null)}
@@ -70,6 +78,7 @@ function App() {
         <div className="split-left">
           <LawList
             laws={laws}
+            categoryMeta={categoryMeta}
             onSelectLaw={setSelectedLaw}
             selectedLaw={selectedLaw}
             onCloseLaw={() => setSelectedLaw(null)}
@@ -84,6 +93,7 @@ function App() {
         <div className="split-right">
           <NetworkGraphStyled
             laws={laws}
+            categoryMeta={categoryMeta}
             onSelectLaw={setSelectedLaw}
             selectedLaw={selectedLaw}
             onCloseLaw={() => setSelectedLaw(null)}
@@ -101,7 +111,13 @@ function App() {
   // ── Stats view: full-screen dark themed ──
   return (
     <div className={`network-fullscreen${lightMode ? ' light' : ''}`}>
-      <StatsOverview laws={laws} onSwitchView={setView} lightMode={lightMode} onToggleTheme={toggleTheme} />
+      <StatsOverview
+        laws={laws}
+        categoryMeta={categoryMeta}
+        onSwitchView={setView}
+        lightMode={lightMode}
+        onToggleTheme={toggleTheme}
+      />
     </div>
   )
 }

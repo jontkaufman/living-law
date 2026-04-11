@@ -1,9 +1,9 @@
 import { useMemo } from 'react'
 import { Network, List, Columns2, BarChart3, BookOpen, Sparkles, Users, Clock, Sun, Moon } from 'lucide-react'
-import { OBSERVANCE_CONFIG, LEVEL2_CONFIG, buildHierarchyTree, countAllLaws } from '../lib/lawHelpers'
+import { OBSERVANCE_CONFIG, LEVEL2_CONFIG, buildHierarchyTree, countAllLaws, getSortedChildren } from '../lib/lawHelpers'
 import './StatsOverview.css'
 
-function StatsOverview({ laws, onSwitchView, lightMode, onToggleTheme }) {
+function StatsOverview({ laws, categoryMeta = {}, onSwitchView, lightMode, onToggleTheme }) {
   const totalLaws = laws.length
 
   const stats = useMemo(() => {
@@ -53,7 +53,7 @@ function StatsOverview({ laws, onSwitchView, lightMode, onToggleTheme }) {
     const l2Counts = []
     ;['love-god', 'love-neighbor'].forEach(root => {
       if (!tree[root]) return
-      Object.entries(tree[root]._children).forEach(([key, node]) => {
+      getSortedChildren(tree[root]._children, categoryMeta).forEach(([key, node]) => {
         const config = LEVEL2_CONFIG[key]
         l2Counts.push({
           key,
@@ -64,16 +64,9 @@ function StatsOverview({ laws, onSwitchView, lightMode, onToggleTheme }) {
         })
       })
     })
-    // Sort by commandment number (1-10), then by count for non-commandments
-    l2Counts.sort((a, b) => {
-      if (a.sortNum !== Infinity && b.sortNum !== Infinity) return a.sortNum - b.sortNum
-      if (a.sortNum !== Infinity) return -1
-      if (b.sortNum !== Infinity) return 1
-      return b.count - a.count
-    })
 
     return { loveGod, loveNeighbor, l2Counts }
-  }, [laws])
+  }, [laws, categoryMeta])
 
   const fmtKey = (k) => k.replace(/_/g, ' ')
   const pct = (n) => totalLaws > 0 ? ((n / totalLaws) * 100).toFixed(1) : '0'
