@@ -166,6 +166,7 @@
 
 .accordion-row-count {
   flex-shrink: 0;
+  margin-left: auto;
   font-family: 'JetBrains Mono', monospace;
   font-size: 12px;
   letter-spacing: 1px;
