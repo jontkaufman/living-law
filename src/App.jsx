@@ -83,7 +83,11 @@ function App() {
         spotlightClicks={false}
         styles={getTourStyles(lightMode)}
         callback={handleJoyrideCallback}
-        tooltipComponent={TourTooltip}
+        tooltipComponent={(props) => (
+          <div data-theme={lightMode ? 'light' : 'dark'}>
+            <TourTooltip {...props} />
+          </div>
+        )}
         floaterProps={{
           disableAnimation: false,
           placement: 'auto'

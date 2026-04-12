@@ -1,7 +1,20 @@
 /* src/components/TourTooltip.css */
 .tour-tooltip {
   max-width: 380px;
-  padding: 0;
+  padding: 20px;
+  background: #2d2c2a;
+  color: #f5f5f0;
+  border-radius: 8px;
+  border: 1px solid rgba(210, 180, 120, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* Light mode overrides */
+[data-theme="light"] .tour-tooltip {
+  background: #ffffff;
+  color: #0a0908;
+  border: 1px solid rgba(166, 138, 32, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
 .tour-title {
@@ -44,15 +57,45 @@
 }
 
 .tour-btn-primary {
-  /* Styles from tourStyles.js buttonNext */
+  background-color: #d2b478;
+  color: #0a0908;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+}
+
+[data-theme="light"] .tour-btn-primary {
+  background-color: #a68a20;
+  color: #ffffff;
 }
 
 .tour-btn-back {
-  /* Styles from tourStyles.js buttonBack */
+  background: transparent;
+  color: #d2b478;
+  border: 1px solid #d2b478;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-right: 8px;
+}
+
+[data-theme="light"] .tour-btn-back {
+  color: #a68a20;
+  border-color: #a68a20;
 }
 
 .tour-btn-skip {
-  /* Styles from tourStyles.js buttonSkip */
+  background: transparent;
+  color: #a0a0a0;
+  border: none;
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
 }
 
 .tour-progress {
