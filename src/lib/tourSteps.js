@@ -6,12 +6,10 @@ export const tourSteps = [
     disableBeacon: true,
     title: 'Welcome to the Torah Laws',
     content: `Explore the laws in the Torah and how they relate to us today.
-You'll find these organized under the two greatest commands -
-Love YHWH and Love Your Neighbor - the 10 commandments all fall
-under these two and the rest of the laws are categorized under
-those. This interactive map reveals how they all connect and
-allows you to navigate and explore God's ways. Navigate categories,
-read original verses, and discover the structure behind biblical law.`,
+
+These laws are organized under the two greatest commands — Love YHWH and Love Your Neighbor. The 10 commandments fall under these two, and all other laws are categorized accordingly.
+
+This interactive map reveals how they all connect. Navigate categories, read original verses, and discover the structure behind biblical law.`,
     locale: { skip: 'Skip Tour', next: 'Next' },
   },
   {
@@ -19,8 +17,7 @@ read original verses, and discover the structure behind biblical law.`,
     placement: 'center',
     disableBeacon: true,
     title: 'Navigate the Network',
-    content: `Click on any glowing node to explore that category. The network
-expands to show subcategories and individual laws.
+    content: `Click on any glowing node to explore that category. The network expands to show subcategories and individual laws.
 
 Click a law (the small circles) to view its details.`,
   },
@@ -29,16 +26,18 @@ Click a law (the small circles) to view its details.`,
     placement: 'left',
     disableBeacon: true,
     title: 'Open Side Panel',
-    content: `When you click a law, the side panel opens with the full text,
-references, and related information.`,
+    content: `When you click a law, the side panel opens.
+
+You'll see the full text, references, and related information.`,
   },
   {
     target: '[data-tour="panel-references"]',
     placement: 'left',
     disableBeacon: true,
     title: 'Using the Side Panel',
-    content: `Click any reference (like "Exodus 20:8-11") to read the original
-verse in context.`,
+    content: `Click any reference (like "Exodus 20:8-11") to read the original verse.
+
+The verse will appear in context so you can understand it fully.`,
   },
   {
     target: '[data-tour="view-switchers"]',
@@ -46,6 +45,7 @@ verse in context.`,
     disableBeacon: true,
     title: 'View Switchers',
     content: `Switch between different views:
+
 • Network - Visual map of connections
 • List - Browse by categories
 • Split - Both views side-by-side
