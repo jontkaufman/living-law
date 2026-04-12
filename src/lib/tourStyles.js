@@ -1,9 +1,9 @@
 // src/lib/tourStyles.js
 export const getTourStyles = (lightMode) => ({
   options: {
-    arrowColor: lightMode ? '#ffffff' : '#0a0908',
-    backgroundColor: lightMode ? '#ffffff' : '#0a0908',
-    overlayColor: lightMode ? 'rgba(255, 255, 255, 0.75)' : 'rgba(10, 9, 8, 0.75)',
+    arrowColor: lightMode ? '#ffffff' : '#2d2c2a',
+    backgroundColor: lightMode ? '#ffffff' : '#2d2c2a',
+    overlayColor: lightMode ? 'rgba(255, 255, 255, 0.75)' : 'rgba(10, 9, 8, 0.85)',
     primaryColor: lightMode ? '#a68a20' : '#d2b478',
     textColor: lightMode ? '#0a0908' : '#f5f5f0',
     width: 380,
