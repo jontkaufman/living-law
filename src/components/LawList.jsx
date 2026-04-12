@@ -123,7 +123,7 @@ function LawList({ laws, categoryMeta = {}, onSelectLaw, selectedLaw, onCloseLaw
       result.push({
         key: 'love-god',
         label: 'LOVE YHWH',
-        subtitle: 'with all your heart',
+        subtitle: 'with all your heart, soul and strength',
         node: hierarchy['love-god'],
         color: [220, 190, 130],
       })

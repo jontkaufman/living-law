@@ -261,7 +261,7 @@ function NetworkGraphStyled({ laws, categoryMeta = {}, onSelectLaw, selectedLaw,
 
     // ─ Great commands ─
     nodes.push({
-      id: 'love-god', label: 'LOVE YHWH', subtitle: 'with all your heart',
+      id: 'love-god', label: 'LOVE YHWH', subtitle: 'with all your heart, soul and strength',
       type: 'great-command', color: [220, 190, 130],
       coreRadius: 10, glowRadius: 60,
       x: LOVE_GOD_X, y: ROOT_Y,
