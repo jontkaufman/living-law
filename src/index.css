@@ -57,6 +57,42 @@
   .split-right { width: 50%; }
 }
 
+/* ── Tablet: Stack split view vertically ── */
+@media (max-width: 768px) {
+  .split-fullscreen {
+    flex-direction: column;
+  }
+
+  .split-left {
+    width: 100%;
+    height: 50%;
+    border-right: none;
+    border-bottom: 1px solid rgba(210, 180, 120, 0.12);
+  }
+
+  .split-right {
+    width: 100%;
+    height: 50%;
+  }
+
+  .split-fullscreen.light .split-left {
+    border-right: none;
+    border-bottom-color: rgba(160, 140, 100, 0.15);
+  }
+}
+
+/* ── Mobile: Show only network in split view ── */
+@media (max-width: 480px) {
+  .split-left {
+    display: none; /* Hide list on mobile in split view */
+  }
+
+  .split-right {
+    width: 100%;
+    height: 100%;
+  }
+}
+
 /* ── Light mode for wrapper elements ── */
 .network-fullscreen.light,
 .split-fullscreen.light {

@@ -1558,73 +1558,218 @@
   color: rgba(80, 60, 30, 0.95);
 }
 
+/* ── Tablet (768px and below) ── */
 @media (max-width: 768px) {
   .network-header {
-    padding: 10px 14px;
+    padding: 12px 16px;
+    min-height: 56px;
+  }
+
+  .nav-btn {
+    min-width: 44px;
+    min-height: 44px; /* Touch target */
+    padding: 10px;
   }
 
   .breadcrumbs {
-    font-size: 8px;
+    font-size: 11px;
+  }
+
+  .breadcrumb-separator {
+    font-size: 9px;
+    margin: 0 6px;
   }
 
   .network-hint {
-    font-size: 7px;
-    letter-spacing: 1px;
-    padding: 4px 10px;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    padding: 6px 12px;
   }
 
   .network-legend {
     top: auto;
     bottom: 60px;
     right: 12px;
+    padding: 12px;
+  }
+
+  .legend-title {
+    font-size: 11px;
+    margin-bottom: 6px;
+  }
+
+  .legend-item {
+    font-size: 10px;
+    padding: 4px 0;
+  }
+
+  .legend-dot {
+    width: 8px;
+    height: 8px;
+  }
+
+  /* Full screen side panel on tablet */
+  .side-panel {
+    width: 100%;
+    max-width: 100%;
+    right: 0;
+    border-radius: 0;
+  }
+
+  .side-panel-close {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .search-input {
+    width: 200px;
+    font-size: 16px; /* Prevents iOS zoom */
+    min-height: 44px;
+    padding: 10px 12px;
+  }
+
+  .search-dropdown {
+    width: calc(100vw - 32px);
+    max-width: 400px;
+  }
+
+  .feedback-btn {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .feedback-btn span {
+    display: none; /* Icon only on tablet */
+  }
+
+  .observance-legend-container {
+    bottom: 56px;
+    right: 12px;
+  }
+
+  .observance-legend {
+    padding: 10px 12px;
+  }
+
+  .observance-legend-item {
+    font-size: 10px;
+    padding: 3px 6px;
+  }
+
+  .observance-legend-symbol {
+    font-size: 13px;
+  }
+
+  /* Canvas optimizations for touch */
+  .network-canvas {
+    touch-action: pan-x pan-y pinch-zoom;
+    cursor: grab;
+  }
+
+  .network-canvas:active {
+    cursor: grabbing;
+  }
+}
+
+/* ── Mobile (480px and below) ── */
+@media (max-width: 480px) {
+  .network-header {
+    padding: 10px 12px;
+    flex-wrap: wrap;
+  }
+
+  .network-header-left,
+  .network-header-right {
+    gap: 4px;
+  }
+
+  .breadcrumbs {
+    font-size: 10px;
+    order: 3;
+    width: 100%;
+    margin-top: 8px;
+    flex-wrap: wrap;
+  }
+
+  .breadcrumb-separator {
+    margin: 0 4px;
+  }
+
+  .network-hint {
+    font-size: 9px;
+    letter-spacing: 1px;
+    padding: 5px 10px;
+    bottom: 52px;
+  }
+
+  .network-legend {
+    bottom: 56px;
+    right: 8px;
+    left: 8px;
     padding: 10px;
   }
 
   .legend-title {
-    font-size: 8px;
-  }
-
-  .legend-item {
-    font-size: 7px;
-  }
-
-  .legend-dot {
-    width: 6px;
-    height: 6px;
-  }
-
-  .side-panel {
-    width: 100%;
-    max-width: 100%;
-  }
-
-  .search-input {
-    width: 180px;
     font-size: 10px;
   }
 
-  .search-dropdown {
-    width: 280px;
+  .legend-item {
+    font-size: 9px;
   }
 
-  .feedback-btn span {
-    display: none;
+  /* Full viewport side panel */
+  .side-panel {
+    width: 100vw;
+    max-width: 100vw;
+    height: 100vh;
+    top: 0;
+    right: 0;
+    border-radius: 0;
+  }
+
+  .side-panel-header {
+    padding: 14px 12px;
+  }
+
+  .side-panel-title {
+    font-size: 18px;
+  }
+
+  .search-input {
+    width: 100%;
+    font-size: 16px;
+  }
+
+  .search-dropdown {
+    width: calc(100vw - 24px);
+    left: 12px;
+    right: 12px;
   }
 
   .observance-legend-container {
-    bottom: 48px;
-    right: 10px;
+    bottom: 52px;
+    left: 8px;
+    right: 8px;
   }
 
   .observance-legend {
-    padding: 8px 10px;
+    padding: 8px;
+    flex-wrap: wrap;
   }
 
   .observance-legend-item {
-    font-size: 8px;
+    font-size: 9px;
+    padding: 2px 4px;
   }
 
   .observance-legend-symbol {
-    font-size: 11px;
+    font-size: 12px;
+  }
+
+  /* Larger touch targets for network nodes */
+  .network-canvas-wrap {
+    cursor: grab;
+    -webkit-user-select: none;
+    user-select: none;
   }
 }

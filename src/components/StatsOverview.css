@@ -420,43 +420,122 @@
 }
 
 /* ── Responsive ── */
+/* ── Tablet (768px and below) ── */
 @media (max-width: 768px) {
   .stats-header {
-    padding: 10px 14px;
+    padding: 12px 16px;
+    min-height: 56px;
+  }
+
+  .nav-btn {
+    min-width: 44px;
+    min-height: 44px; /* Touch target */
+    padding: 10px;
   }
 
   .stats-title {
-    font-size: 20px;
+    font-size: 22px;
   }
 
   .stats-body {
-    padding: 16px 14px 60px;
+    padding: 18px 16px 60px;
   }
 
   .stats-metrics {
-    gap: 10px;
+    gap: 12px;
+    flex-wrap: wrap;
   }
 
   .stats-metric {
-    min-width: 110px;
-    padding: 12px 10px;
+    min-width: 120px;
+    padding: 14px 12px;
+    flex: 1 1 calc(50% - 6px); /* Two columns on tablet */
   }
 
   .stats-metric-value {
-    font-size: 28px;
+    font-size: 30px;
+  }
+
+  .stats-metric-label {
+    font-size: 12px;
   }
 
   .stats-grid {
     grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .stats-card {
+    padding: 16px;
+  }
+
+  .stats-card-title {
+    font-size: 15px;
   }
 
   .stats-bar-label {
-    width: 100px;
+    width: 120px;
+    font-size: 11px;
+  }
+
+  .stats-bar-value {
+    width: 80px;
+    font-size: 11px;
+  }
+}
+
+/* ── Mobile (480px and below) ── */
+@media (max-width: 480px) {
+  .stats-header {
+    padding: 10px 12px;
+  }
+
+  .stats-title {
+    font-size: 18px;
+  }
+
+  .stats-body {
+    padding: 14px 12px 60px;
+  }
+
+  .stats-metrics {
+    gap: 8px;
+  }
+
+  .stats-metric {
+    min-width: 100%;
+    flex: 1 1 100%; /* Full width on phone */
+    padding: 12px;
+  }
+
+  .stats-metric-value {
+    font-size: 26px;
+  }
+
+  .stats-metric-label {
+    font-size: 11px;
+  }
+
+  .stats-card {
+    padding: 12px;
+  }
+
+  .stats-card-title {
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+
+  .stats-bar-label {
+    width: 90px;
     font-size: 10px;
   }
 
   .stats-bar-value {
-    width: 70px;
+    width: 60px;
     font-size: 10px;
+  }
+
+  .stats-bar-fill {
+    height: 20px;
   }
 }
