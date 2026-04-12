@@ -95,7 +95,7 @@ export function getShortTitle(law, maxLen = 50) {
 
   // Only apply transformations to law_summary, not to preview or reference
   if (!law.preview && law.law_summary) {
-    title = title.replace(/^(The law that|Law that|Command to|Requirement to|Prohibition against|You shall|You must|Do not)\s+/i, '')
+    title = title.replace(/^(The law that|Law that|Command to|Requirement to|Prohibition against|You shall|You must)\s+/i, '')
     title = title.charAt(0).toUpperCase() + title.slice(1)
   }
 

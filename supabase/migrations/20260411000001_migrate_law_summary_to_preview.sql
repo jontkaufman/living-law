@@ -3,18 +3,19 @@
 -- Date: 2026-04-11
 
 -- Transform law_summary to preview by:
--- 1. Stripping common prefixes (The law that, Law that, Command to, Do not, etc.)
+-- 1. Stripping common prefixes (The law that, Law that, Command to, etc.)
 -- 2. Capitalizing first letter
 -- 3. Truncating to 100 characters with ellipsis
+-- NOTE: "Do not" is NOT stripped to preserve the prohibition meaning
 
 -- Use CTE to compute the transformation once and reuse it
 WITH transformed AS (
   SELECT
     pa.law_id,
-    -- Step 1: Strip common prefixes
+    -- Step 1: Strip common prefixes (NOT including "Do not")
     regexp_replace(
       l.law_summary,
-      '^(The law that|Law that|Command to|Requirement to|Prohibition against|You shall|You must|Do not)\s+',
+      '^(The law that|Law that|Command to|Requirement to|Prohibition against|You shall|You must)\s+',
       '',
       'i'
     ) AS stripped_text
