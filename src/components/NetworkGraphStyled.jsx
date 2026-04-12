@@ -78,7 +78,7 @@ function drawStar(ctx, x, y, rgb, coreRadius, glowRadius, intensity = 1.0) {
 
 // ── Component ────────────────────────────────────────────────────────────────
 
-function NetworkGraphStyled({ laws, categoryMeta = {}, onSelectLaw, selectedLaw, onCloseLaw, onSwitchView, navState, onNavChange, lightMode, onToggleTheme, onRestartTour }) {
+function NetworkGraphStyled({ laws, categoryMeta = {}, onSelectLaw, selectedLaw, onCloseLaw, onSwitchView, navState, onNavChange, lightMode, onToggleTheme, onShowHelp }) {
   const canvasRef = useRef(null)
   const animFrameRef = useRef(null)
   const lightModeRef = useRef(false)
@@ -1278,7 +1278,7 @@ function NetworkGraphStyled({ laws, categoryMeta = {}, onSelectLaw, selectedLaw,
           </button>
           <button
             className="nav-btn"
-            onClick={() => onRestartTour?.()}
+            onClick={() => onShowHelp?.()}
             title="Restart Tour"
             data-tour="help-button"
           >

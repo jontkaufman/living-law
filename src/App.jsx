@@ -7,6 +7,7 @@ import NetworkGraphStyled from './components/NetworkGraphStyled'
 import { tourSteps } from './lib/tourSteps'
 import { getTourStyles } from './lib/tourStyles'
 import TourTooltip from './components/TourTooltip'
+import HelpModal from './components/HelpModal'
 
 function App() {
   const [laws, setLaws] = useState([])
@@ -32,6 +33,9 @@ function App() {
       return false // If localStorage unavailable, don't auto-start
     }
   })
+
+  // Help modal state
+  const [showHelp, setShowHelp] = useState(false)
 
   // Load laws and category metadata from Supabase
   useEffect(() => {
@@ -62,13 +66,8 @@ function App() {
     }
   }, [])
 
-  const handleRestartTour = useCallback(() => {
-    try {
-      localStorage.removeItem('torahLawsTourCompleted')
-    } catch {
-      // Ignore localStorage errors
-    }
-    setRunTour(true)
+  const handleShowHelp = useCallback(() => {
+    setShowHelp(true)
   }, [])
 
   return (
@@ -94,6 +93,13 @@ function App() {
         }}
       />
 
+      {/* Help Modal */}
+      <HelpModal
+        isOpen={showHelp}
+        onClose={() => setShowHelp(false)}
+        lightMode={lightMode}
+      />
+
       {/* ── Network view: full-screen ── */}
       {view === 'network' && (
         <div className={`network-fullscreen${lightMode ? ' light' : ''}`}>
@@ -106,7 +112,7 @@ function App() {
             onSwitchView={setView}
             lightMode={lightMode}
             onToggleTheme={toggleTheme}
-            onRestartTour={handleRestartTour}
+            onShowHelp={handleShowHelp}
           />
         </div>
       )}
@@ -123,7 +129,7 @@ function App() {
             onSwitchView={setView}
             lightMode={lightMode}
             onToggleTheme={toggleTheme}
-            onRestartTour={handleRestartTour}
+            onShowHelp={handleShowHelp}
           />
         </div>
       )}
@@ -144,7 +150,7 @@ function App() {
               onNavChange={setNavState}
               lightMode={lightMode}
               onToggleTheme={toggleTheme}
-              onRestartTour={handleRestartTour}
+              onShowHelp={handleShowHelp}
             />
           </div>
           <div className="split-right">
@@ -159,7 +165,7 @@ function App() {
               onNavChange={setNavState}
               lightMode={lightMode}
               onToggleTheme={toggleTheme}
-              onRestartTour={handleRestartTour}
+              onShowHelp={handleShowHelp}
             />
           </div>
         </div>
@@ -174,7 +180,7 @@ function App() {
             onSwitchView={setView}
             lightMode={lightMode}
             onToggleTheme={toggleTheme}
-            onRestartTour={handleRestartTour}
+            onShowHelp={handleShowHelp}
           />
         </div>
       )}

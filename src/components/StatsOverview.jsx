@@ -3,7 +3,7 @@ import { Network, List, Columns2, BarChart3, BookOpen, Sparkles, Users, Clock, S
 import { OBSERVANCE_CONFIG, LEVEL2_CONFIG, buildHierarchyTree, countAllLaws, getSortedChildren } from '../lib/lawHelpers'
 import './StatsOverview.css'
 
-function StatsOverview({ laws, categoryMeta = {}, onSwitchView, lightMode, onToggleTheme, onRestartTour }) {
+function StatsOverview({ laws, categoryMeta = {}, onSwitchView, lightMode, onToggleTheme, onShowHelp }) {
   const totalLaws = laws.length
 
   const stats = useMemo(() => {
@@ -127,10 +127,10 @@ function StatsOverview({ laws, categoryMeta = {}, onSwitchView, lightMode, onTog
           >
             {lightMode ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
           </button>
-          {onRestartTour && (
+          {onShowHelp && (
             <button
               className="nav-btn"
-              onClick={() => onRestartTour()}
+              onClick={() => onShowHelp()}
               title="Restart Tour"
               data-tour="help-button"
             >

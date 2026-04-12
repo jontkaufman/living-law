@@ -8,7 +8,7 @@ import {
 } from '../lib/lawHelpers'
 import './LawList.css'
 
-function LawList({ laws, categoryMeta = {}, onSelectLaw, selectedLaw, onCloseLaw, onSwitchView, hideSidePanel, navState, onNavChange, lightMode, onToggleTheme, onRestartTour }) {
+function LawList({ laws, categoryMeta = {}, onSelectLaw, selectedLaw, onCloseLaw, onSwitchView, hideSidePanel, navState, onNavChange, lightMode, onToggleTheme, onShowHelp }) {
   // Internal accordion state — used when not controlled by parent (standalone mode)
   const [_expandedRoot, _setExpandedRoot] = useState(null)
   const [_expandedL2, _setExpandedL2] = useState(null)
@@ -373,10 +373,10 @@ function LawList({ laws, categoryMeta = {}, onSelectLaw, selectedLaw, onCloseLaw
           >
             {lightMode ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
           </button>
-          {onRestartTour && (
+          {onShowHelp && (
             <button
               className="nav-btn"
-              onClick={() => onRestartTour()}
+              onClick={() => onShowHelp()}
               title="Restart Tour"
               data-tour="help-button"
             >
