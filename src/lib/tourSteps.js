@@ -13,8 +13,8 @@ Browse categories, read original verses, and discover the structure behind bibli
     locale: { skip: 'Skip Tour', next: 'Next' },
   },
   {
-    target: '[data-tour="view-switchers"]',
-    placement: 'bottom',
+    target: '[data-tour="list-categories"]',
+    placement: 'right',
     disableBeacon: true,
     title: 'Browse the List',
     content: `You're viewing the list of laws organized by categories. Click the arrows to expand categories and see the laws within.
@@ -41,7 +41,7 @@ The verse will appear in context so you can understand it fully.`,
   },
   {
     target: '[data-tour="view-switchers"]',
-    placement: 'bottom',
+    placement: 'bottom-end',
     disableBeacon: true,
     title: 'Switch Views',
     content: `Try different views to explore the laws:

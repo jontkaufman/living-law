@@ -395,7 +395,11 @@ function LawList({ laws, categoryMeta = {}, onSelectLaw, selectedLaw, onCloseLaw
           const l2Sorted = getSortedChildren(root.node._children, categoryMeta)
 
           return (
-            <div key={root.key} className="accordion-root">
+            <div
+              key={root.key}
+              className="accordion-root"
+              data-tour={root.key === 'love-god' ? 'list-categories' : undefined}
+            >
               <button
                 className={`accordion-row accordion-row-root ${isRootOpen ? 'open' : ''}`}
                 onClick={() => toggleRoot(root.key)}
