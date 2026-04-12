@@ -1278,8 +1278,9 @@ function NetworkGraphStyled({ laws, categoryMeta = {}, onSelectLaw, selectedLaw,
           </button>
           <button
             className="nav-btn"
-            onClick={onRestartTour}
+            onClick={() => onRestartTour?.()}
             title="Restart Tour"
+            data-tour="help-button"
           >
             <HelpCircle className="w-4 h-4" />
           </button>

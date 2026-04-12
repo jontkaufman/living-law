@@ -376,8 +376,9 @@ function LawList({ laws, categoryMeta = {}, onSelectLaw, selectedLaw, onCloseLaw
           {onRestartTour && (
             <button
               className="nav-btn"
-              onClick={onRestartTour}
+              onClick={() => onRestartTour()}
               title="Restart Tour"
+              data-tour="help-button"
             >
               <HelpCircle className="w-4 h-4" />
             </button>
