@@ -13,7 +13,7 @@ function App() {
   const [laws, setLaws] = useState([])
   const [categoryMeta, setCategoryMeta] = useState({})
   const [selectedLaw, setSelectedLaw] = useState(null)
-  const [view, setView] = useState('network') // network, list, split, stats
+  const [view, setView] = useState('list') // network, list, split, stats
   const [lightMode, setLightMode] = useState(false)
   const toggleTheme = () => setLightMode(v => !v)
 
